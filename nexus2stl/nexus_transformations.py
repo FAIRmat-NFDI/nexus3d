@@ -113,6 +113,7 @@ def cube_meshs_from(
 @click.command()
 @click.argument("file")
 @click.option(
+    "-o",
     "--output",
     default="experiment.stl",
     help="The filename to write to (default: experiment.stl).",
