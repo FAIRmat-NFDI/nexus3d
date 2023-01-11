@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nexus2stl"
+version = "0.0.1"
+authors = [
+    { name = "Florian Dobener" },
+]
+description = "Convert NXtransformation matrices inside a nexus file to a stl file"
+readme = "README.md"
+license = { file = "LICENSE.txt" }
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "h5py",
+    "numpy",
+    "pint",
+    "numpy-stl",
+]
+
+[project.scripts]
+nexus2stl = "nexus2stl.nexus_transformations:cli"
