@@ -1,26 +1,16 @@
-"""Walk through a h5py file and find nx_transformation groups"""
-from functools import partial
+"""Create a stl from NXtransformation groups"""
+from os import path
 from typing import Dict
-from dataclasses import dataclass
 import numpy as np
 import h5py
 from pint import UnitRegistry
 from stl import mesh
+import click
 
-from matrix import rotate, translate
-from cube_mesh import create_cube_mesh
+from nexus2stl.matrix import rotate, translate
+from nexus2stl.cube_mesh import create_cube_mesh
 
 ureg = UnitRegistry()
-
-
-@dataclass
-class CoordinateSystem:
-    """Represents a 3D coordinate system with its origin and axes."""
-
-    origin: np.ndarray[(3,), float]
-    x_axis: np.ndarray[(3,), float]
-    y_axis: np.ndarray[(3,), float]
-    z_axis: np.ndarray[(3,), float]
 
 
 def transformation_matrices_from(fname: str) -> Dict[str, np.ndarray[(3,), float]]:
@@ -117,31 +107,31 @@ def cube_meshs_from(
     return mesh.Mesh(scene)
 
 
-def coord_systems_from(fname: str) -> Dict[str, CoordinateSystem]:
-    """Read all NXtransformations coordinate systems from the nexus file."""
+@click.command()
+@click.argument("file")
+@click.option("--output", default="experiment.stl", help="The filename to write to")
+@click.option(
+    "-f",
+    "--force",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Force overwriting of output file",
+)
+def cli(file: str, output: str, force: bool):
+    """Create a stl from a nexus file via the command line"""
 
-    def transform(
-        vector: np.ndarray[(4,), float], matrix: np.ndarray[(4, 4), float]
-    ) -> np.ndarray[(3,), float]:
-        return (matrix @ vector.T)[:-1]
+    if not path.exists(file):
+        print(f"Input file `{file}` does not exist. Aborting.")
+        return
 
-    transformation_matrices = transformation_matrices_from(fname)
+    if not path.isfile(file):
+        print(f"`{file}` is not a file. Aborting.")
+        return
 
-    coordinate_systems = {}
+    if path.exists(output) and not force:
+        print(f"File `{output}` already exists. Use -f to overwrite.")
+        return
 
-    for name, transformation_matrix in transformation_matrices.items():
-        transform_vec = partial(transform, matrix=transformation_matrix)
-        coordinate_systems[name] = CoordinateSystem(
-            origin=transform_vec(np.array([0, 0, 0, 1])),
-            x_axis=transform_vec(np.array([1, 0, 0, 0])),
-            y_axis=transform_vec(np.array([0, 1, 0, 0])),
-            z_axis=transform_vec(np.array([0, 0, 1, 0])),
-        )
-
-    return coordinate_systems
-
-
-if __name__ == "__main__":
-    # coord_systems = coord_systems_from("MoTe2.mpes.nxs")
-    scene = cube_meshs_from(transformation_matrices_from("MoTe2.mpes.nxs"))
-    scene.save("experiment.stl")
+    scene = cube_meshs_from(transformation_matrices_from(file))
+    scene.save(output)
