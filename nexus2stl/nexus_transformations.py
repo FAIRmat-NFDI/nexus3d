@@ -81,18 +81,17 @@ def transformation_matrices_from(fname: str) -> Dict[str, np.ndarray[(3,), float
 
 
 def cube_meshs_from(
-    transformation_matrices: Dict[str, np.ndarray[(3,), float]]
+    transformation_matrices: Dict[str, np.ndarray[(3,), float]], scale: float = 0.1
 ) -> mesh:
     """Creates a composed cube mesh for a dict of transformation matrices.
 
     Args:
         transformation_matrices (Dict[str, np.ndarray[): The transformation matrix dict.
+        scale (float): The scale of the cubes. Defaults to 0.1.
 
     Returns:
         mesh: The composed mesh containing a cube for each transformation matrix.
     """
-    scale = 0.1
-
     # pylint: disable=redefined-outer-name
     scene = None
     for transformation_matrix in transformation_matrices.values():
@@ -109,16 +108,27 @@ def cube_meshs_from(
 
 @click.command()
 @click.argument("file")
-@click.option("--output", default="experiment.stl", help="The filename to write to")
+@click.option(
+    "--output",
+    default="experiment.stl",
+    help="The filename to write to (default: experiment.stl).",
+)
+@click.option(
+    "-s",
+    "--size",
+    default=0.1,
+    type=float,
+    help="The side length of a cube in meters. (default: 0.1 m).",
+)
 @click.option(
     "-f",
     "--force",
     is_flag=True,
     default=False,
     type=bool,
-    help="Force overwriting of output file",
+    help="Force overwriting of output file.",
 )
-def cli(file: str, output: str, force: bool):
+def cli(file: str, output: str, force: bool, size: float):
     """Create a stl from a nexus file via the command line"""
 
     if not path.exists(file):
@@ -133,5 +143,9 @@ def cli(file: str, output: str, force: bool):
         print(f"File `{output}` already exists. Use -f to overwrite.")
         return
 
-    scene = cube_meshs_from(transformation_matrices_from(file))
+    if size <= 0:
+        print(f"`{size} is not a valid size.")
+        return
+
+    scene = cube_meshs_from(transformation_matrices_from(file), size / 2)
     scene.save(output)
