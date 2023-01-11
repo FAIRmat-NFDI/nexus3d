@@ -1,11 +1,14 @@
 """Transformation matrices for nexus"""
 import numpy as np
 from numpy.linalg import norm
+from numpy.typing import NDArray
 
 
 def rotate(
-    angle: float, axis: np.ndarray[(3,), float], offset: np.ndarray[(3,), float]
-) -> np.ndarray[(4, 4), float]:
+    angle: float,
+    axis: NDArray[np.float64],
+    offset: NDArray[np.float64],
+) -> NDArray[np.float64]:
     """Generates a 4D rotation matrix
 
     Returns:
@@ -44,8 +47,8 @@ def rotate(
 
 
 def translate(
-    translation: np.ndarray[(3,), float], offset: np.ndarray[(3,), float]
-) -> np.ndarray[(4, 4), float]:
+    translation: NDArray[np.float64], offset: NDArray[np.float64]
+) -> NDArray[np.float64]:
     """Generation a 4D translation matrix.
 
     Returns:

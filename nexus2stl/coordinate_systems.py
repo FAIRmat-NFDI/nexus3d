@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from functools import partial
 from typing import Dict
 import numpy as np
+from numpy.typing import NDArray
 
 from nexus2stl.nexus_transformations import transformation_matrices_from
 
@@ -11,18 +12,18 @@ from nexus2stl.nexus_transformations import transformation_matrices_from
 class CoordinateSystem:
     """Represents a 3D coordinate system with its origin and axes."""
 
-    origin: np.ndarray[(3,), float]
-    x_axis: np.ndarray[(3,), float]
-    y_axis: np.ndarray[(3,), float]
-    z_axis: np.ndarray[(3,), float]
+    origin: NDArray[np.float64]
+    x_axis: NDArray[np.float64]
+    y_axis: NDArray[np.float64]
+    z_axis: NDArray[np.float64]
 
 
 def coord_systems_from(fname: str) -> Dict[str, CoordinateSystem]:
     """Read all NXtransformations coordinate systems from the nexus file."""
 
     def transform(
-        vector: np.ndarray[(4,), float], matrix: np.ndarray[(4, 4), float]
-    ) -> np.ndarray[(3,), float]:
+        vector: NDArray[np.float64], matrix: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
         return (matrix @ vector.T)[:-1]
 
     transformation_matrices = transformation_matrices_from(fname)

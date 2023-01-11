@@ -2,6 +2,7 @@
 from os import path
 from typing import Dict
 import numpy as np
+from numpy.typing import NDArray
 import h5py
 from pint import UnitRegistry
 from stl import mesh
@@ -13,7 +14,7 @@ from nexus2stl.cube_mesh import create_cube_mesh
 ureg = UnitRegistry()
 
 
-def transformation_matrices_from(fname: str) -> Dict[str, np.ndarray[(3,), float]]:
+def transformation_matrices_from(fname: str) -> Dict[str, NDArray[np.float64]]:
     """Reads all NXtransformations from a nexus file
     and creates a transformation matrix from them."""
 
@@ -41,7 +42,7 @@ def transformation_matrices_from(fname: str) -> Dict[str, np.ndarray[(3,), float
         field = h5file[entry][()]
         if not isinstance(field, float):
             raise NotImplementedError("Only float fields are supported yet.")
-        field_si = ureg(f"{field} {attrs['units']}").to_base_units().magnitude
+        field_si = ureg(f"{field} {attrs['units']}").to_base_units().magnitude  # type: ignore
 
         if attrs["transformation_type"] == "translation":
             matrix = translate(field_si * vector, offset_si)
@@ -65,7 +66,7 @@ def transformation_matrices_from(fname: str) -> Dict[str, np.ndarray[(3,), float
                 name.removesuffix("/depends_on").removeprefix("entry/")
             ] = dataset[()].decode("utf-8")
 
-    transformation_groups = {}
+    transformation_groups: Dict[str, h5py.Dataset] = {}
     transformation_matrices = {}
     with h5py.File(fname, "r") as h5file:
         h5file.visititems(get_transformation_group_names)
@@ -81,8 +82,8 @@ def transformation_matrices_from(fname: str) -> Dict[str, np.ndarray[(3,), float
 
 
 def cube_meshs_from(
-    transformation_matrices: Dict[str, np.ndarray[(3,), float]], scale: float = 0.1
-) -> mesh:
+    transformation_matrices: Dict[str, NDArray[np.float64]], scale: float = 0.1
+) -> mesh.Mesh:
     """Creates a composed cube mesh for a dict of transformation matrices.
 
     Args:

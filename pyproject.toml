@@ -10,7 +10,7 @@ authors = [
 ]
 description = "Convert NXtransformation matrices inside a nexus file to a stl file"
 readme = "README.md"
-license = { file = "LICENSE.txt" }
+license = { file = "LICENSE" }
 requires-python = ">=3.7"
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -23,6 +23,15 @@ dependencies = [
     "pint",
     "numpy-stl",
     "click",
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy",
+    "pylint",
+    "pycodestyle",
+    "pytest",
+    "pytest-cov",
 ]
 
 [project.scripts]
