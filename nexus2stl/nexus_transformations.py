@@ -62,7 +62,7 @@ def transformation_matrices_from(fname: str) -> Dict[str, NDArray[np.float64]]:
         )
 
     def get_transformation_group_names(name: str, dataset: h5py.Dataset):
-        if "depends_on" in name:
+        if "depends_on" in name and "process" not in name:
             transformation_groups[
                 name.rsplit("/", 1)[0].split("/", 1)[-1]
                 if version_info.minor < 9
@@ -113,6 +113,7 @@ def cube_meshs_from(
 @click.command()
 @click.argument("file")
 @click.option(
+    "-o",
     "--output",
     default="experiment.stl",
     help="The filename to write to (default: experiment.stl).",
