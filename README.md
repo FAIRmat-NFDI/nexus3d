@@ -1,46 +1,36 @@
 # Scope
 
-This is a testing project for reading out NX_TRANSFORMATION matrices from nexus files and
-visualizing them.
-There are two code snippets for either [reading](https://github.com/dials/dials/blob/5bf004bf8f92e891d0008d27b747578f0d35e827/src/dials/util/nexus/nx_mx.py#L126) or [writing](https://github.com/dials/cctbx/blob/master/xfel/euxfel/agipd_cxigeom2nexus.py) NX_TRANSFORMATION groups.
-There is also the [nexus-constructor](https://github.com/ess-dmsc/nexus-constructor) which is able to
-construct nexus transformation groups but is not able to load and display transformation groups
-from nexus files.
+This is a project for reading out NX_TRANSFORMATION matrices from nexus files and
+visualizing them by creating a stl which may be importet into 3D visualization software.
 
-# Idea
+# Install
 
-The idea is to extract a plane into a dxf file with [ezdxf](https://github.com/mozman/ezdxf).
-Then a CAD software can be used to check whether the transformations are correct,
-i.e. checking angles with respect to each other.
-
-# Progress
-
-- [ ] Extract transformation groups from an example file (`MoTe2.mpes.nxs`).
-- [ ] Draw it as points into the final dxf file
-- [ ] Add a line for the beam in the experiment
-- [ ] Try to load the file with FreeCAD and try to extract an angle
-
-## Transformation matrices
-
-[Here](https://www.brainvoyager.com/bv/doc/UsersGuide/CoordsAndTransforms/SpatialTransformationMatrices.html) is some literature on affine 4D transformation matrices.
-
-TL;DR: A point is represented by (x, y, z, 1).T to account also for translations and
-a vector is represented by (x, y, z, 0).T to strip it of its position.
-
-With this 4x4 transformation matrixes are build as
+Just execute
 
 ```
-[R, o]
-[0, 1]
+pip install .
 ```
 
-for rotation and
+from the cloned git repository or add an optional `-e` to install it in development mode.
+
+# Usage
+
+Execute
 
 ```
-[I, t+o]
-[0, 1]
+nexus2stl nexus_file.nxs
 ```
 
-for translation in nexus.
-Where o is an offset vector, t is the translation vector and R is a rotation matrix.
-Read more details [here](https://manual.nexusformat.org/classes/base_classes/NXtransformations.html#nxtransformations).
+on your nexus file to generate an output file `experiment.stl`.
+The usage of the command is as follows:
+
+```
+Usage: nexus2stl [OPTIONS] FILE
+
+  Create a stl from a nexus file via the command line
+
+Options:
+  --output TEXT  The filename to write to
+  -f, --force    Force overwriting of output file
+  --help         Show this message and exit.
+```
