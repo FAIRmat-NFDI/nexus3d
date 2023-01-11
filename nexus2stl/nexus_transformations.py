@@ -139,6 +139,10 @@ def cli(file: str, output: str, force: bool, size: float):
         print(f"`{file}` is not a file. Aborting.")
         return
 
+    if not h5py.is_hdf5(file):
+        print(f"Input file `{file}` is not a valid HDF5 file. Aborting.")
+        return
+
     if path.exists(output) and not force:
         print(f"File `{output}` already exists. Use -f to overwrite.")
         return
