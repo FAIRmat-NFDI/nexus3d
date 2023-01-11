@@ -61,7 +61,7 @@ def transformation_matrices_from(fname: str) -> Dict[str, NDArray[np.float64]]:
         )
 
     def get_transformation_group_names(name: str, dataset: h5py.Dataset):
-        if "depends_on" in name and "process" not in name:
+        if "depends_on" in name:
             transformation_groups[
                 name.removesuffix("/depends_on").removeprefix("entry/")
             ] = dataset[()].decode("utf-8")
@@ -133,24 +133,21 @@ def cli(file: str, output: str, force: bool, size: float):
     """Create a stl from a nexus file via the command line"""
 
     if not path.exists(file):
-        print(f"Input file `{file}` does not exist. Aborting.")
-        return
+        raise click.FileError(file, hint="File does not exist.")
 
     if not path.isfile(file):
-        print(f"`{file}` is not a file. Aborting.")
-        return
+        raise click.FileError(file, hint="Is not a file.")
 
     if not h5py.is_hdf5(file):
-        print(f"Input file `{file}` is not a valid HDF5 file. Aborting.")
-        return
+        raise click.FileError(file, hint="Not a valid HDF5 file.")
 
     if path.exists(output) and not force:
-        print(f"File `{output}` already exists. Use -f to overwrite.")
-        return
+        raise click.FileError(output, hint="File already exists. Use -f to overwrite.")
 
     if size <= 0:
-        print(f"`{size} is not a valid size.")
-        return
+        raise click.BadOptionUsage(
+            "size", f"Not a valid size: {size}. Size needs to be > 0."
+        )
 
     scene = cube_meshs_from(transformation_matrices_from(file), size / 2)
     scene.save(output)

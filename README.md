@@ -5,7 +5,20 @@ visualizing them by creating a stl which may be importet into 3D visualization s
 
 # Install
 
-Just execute
+The easiest way to install is with pip
+
+```
+pip install git+https://github.com/domna/nexus2stl.git
+```
+
+If you want to keep to source code or use a development install clone the repostitory
+
+```
+git clone https://github.com/domna/nexus2stl.git
+cd nexus2stl
+```
+
+and install with
 
 ```
 pip install .
