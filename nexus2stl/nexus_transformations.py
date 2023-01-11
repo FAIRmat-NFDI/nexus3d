@@ -1,4 +1,5 @@
 """Create a stl from NXtransformation groups"""
+from sys import version_info
 from os import path
 from typing import Dict
 import numpy as np
@@ -63,7 +64,9 @@ def transformation_matrices_from(fname: str) -> Dict[str, NDArray[np.float64]]:
     def get_transformation_group_names(name: str, dataset: h5py.Dataset):
         if "depends_on" in name:
             transformation_groups[
-                name.removesuffix("/depends_on").removeprefix("entry/")
+                name.rsplit("/", 1)[0].split("/", 1)[-1]
+                if version_info.minor < 9
+                else name.removesuffix("/depends_on").removeprefix("entry/")
             ] = dataset[()].decode("utf-8")
 
     transformation_groups: Dict[str, h5py.Dataset] = {}
