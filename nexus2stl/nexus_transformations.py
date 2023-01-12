@@ -15,7 +15,9 @@ from nexus2stl.cube_mesh import create_cube_mesh
 ureg = UnitRegistry()
 
 
-def transformation_matrices_from(fname: str) -> Dict[str, NDArray[np.float64]]:
+def transformation_matrices_from(
+    fname: str, include_process: bool
+) -> Dict[str, NDArray[np.float64]]:
     """Reads all NXtransformations from a nexus file
     and creates a transformation matrix from them."""
 
@@ -62,6 +64,9 @@ def transformation_matrices_from(fname: str) -> Dict[str, NDArray[np.float64]]:
         )
 
     def get_transformation_group_names(name: str, dataset: h5py.Dataset):
+        if not include_process and name.startswith("entry/process"):
+            return
+
         if "depends_on" in name:
             transformation_groups[
                 name.rsplit("/", 1)[0].split("/", 1)[-1]
@@ -133,7 +138,14 @@ def cube_meshs_from(
     type=bool,
     help="Force overwriting of output file.",
 )
-def cli(file: str, output: str, force: bool, size: float):
+@click.option(
+    "--include-process",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help="Include transformations inside /entry/process",
+)
+def cli(file: str, output: str, force: bool, size: float, include_process: bool):
     """Create a stl from a nexus file via the command line"""
 
     if not path.exists(file):
@@ -153,5 +165,7 @@ def cli(file: str, output: str, force: bool, size: float):
             "size", f"Not a valid size: {size}. Size needs to be > 0."
         )
 
-    scene = cube_meshs_from(transformation_matrices_from(file), size / 2)
+    scene = cube_meshs_from(
+        transformation_matrices_from(file, include_process), size / 2
+    )
     scene.save(output)
