@@ -18,7 +18,9 @@ class CoordinateSystem:
     z_axis: NDArray[np.float64]
 
 
-def coord_systems_from(fname: str) -> Dict[str, CoordinateSystem]:
+def coord_systems_from(
+    fname: str, include_process: bool = False
+) -> Dict[str, CoordinateSystem]:
     """Read all NXtransformations coordinate systems from the nexus file."""
 
     def transform(
@@ -26,7 +28,7 @@ def coord_systems_from(fname: str) -> Dict[str, CoordinateSystem]:
     ) -> NDArray[np.float64]:
         return (matrix @ vector.T)[:-1]
 
-    transformation_matrices = transformation_matrices_from(fname)
+    transformation_matrices = transformation_matrices_from(fname, include_process)
 
     coordinate_systems = {}
 
