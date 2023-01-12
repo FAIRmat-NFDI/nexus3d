@@ -43,8 +43,9 @@ Usage: nexus2stl [OPTIONS] FILE
   Create a stl from a nexus file via the command line
 
 Options:
-  --output TEXT     The filename to write to (default: experiment.stl).
-  -s, --size FLOAT  The side length of a cube in meters. (default: 0.1 m).
-  -f, --force       Force overwriting of output file.
-  --help            Show this message and exit.
+  -o, --output TEXT  The filename to write to (default: experiment.stl).
+  -s, --size FLOAT   The side length of a cube in meters. (default: 0.1 m).
+  -f, --force        Force overwriting of output file.
+  --include-process  Include transformations inside /entry/process
+  --help             Show this message and exit.
 ```
