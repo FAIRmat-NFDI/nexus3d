@@ -3,15 +3,15 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nexus2stl"
+name = "nexus3d"
 version = "0.0.1"
 authors = [
     { name = "Florian Dobener" },
 ]
-description = "Convert NXtransformation matrices inside a nexus file to a stl file"
+description = "Convert NXtransformation matrices inside a nexus file to 3D file formats"
 readme = "README.md"
 license = { file = "LICENSE" }
-requires-python = ">=3.8,<3.11"
+requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: Apache Software License",
@@ -35,4 +35,4 @@ dev = [
 ]
 
 [project.scripts]
-nexus2stl = "nexus2stl.nexus_transformations:cli"
+nexus2stl = "nexus3d.nexus_transformations:cli"

@@ -5,7 +5,7 @@ from typing import Dict
 import numpy as np
 from numpy.typing import NDArray
 
-from nexus2stl.nexus_transformations import transformation_matrices_from
+from nexus3d.nexus_transformations import transformation_matrices_from
 
 
 @dataclass

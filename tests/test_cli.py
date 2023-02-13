@@ -2,7 +2,7 @@
 import os
 from click.testing import CliRunner
 
-from nexus2stl.nexus_transformations import cli
+from nexus3d.nexus_transformations import cli
 
 
 def test_cli(tmp_path):

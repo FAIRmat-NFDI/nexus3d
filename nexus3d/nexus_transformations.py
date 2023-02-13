@@ -9,8 +9,8 @@ from pint import UnitRegistry
 from stl import mesh
 import click
 
-from nexus2stl.matrix import rotate, translate
-from nexus2stl.cube_mesh import create_cube_mesh
+from nexus3d.matrix import rotate, translate
+from nexus3d.cube_mesh import create_cube_mesh
 
 ureg = UnitRegistry()
 
