@@ -35,4 +35,4 @@ dev = [
 ]
 
 [project.scripts]
-nexus2stl = "nexus3d.nexus_transformations:cli"
+nexus3d = "nexus3d.nexus_transformations:cli"

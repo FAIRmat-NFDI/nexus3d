@@ -1,21 +1,21 @@
 # Scope
 
 This is a project for reading out NX_TRANSFORMATION matrices from nexus files and
-visualizing them by creating a stl which may be importet into 3D visualization software.
+visualizing them by creating a 3D representation file (e.g. stl or gltf) which may be importet into 3D visualization software.
 
 # Install
 
 The easiest way to install is with pip
 
 ```
-pip install git+https://github.com/domna/nexus2stl.git
+pip install git+https://github.com/domna/nexus3d.git
 ```
 
 If you want to keep to source code or use a development install clone the repostitory
 
 ```
-git clone https://github.com/domna/nexus2stl.git
-cd nexus2stl
+git clone https://github.com/domna/nexus3d.git
+cd nexus3d
 ```
 
 and install with
@@ -31,14 +31,14 @@ from the cloned git repository or add an optional `-e` to install it in developm
 Execute
 
 ```
-nexus2stl nexus_file.nxs
+nexus3d nexus_file.nxs
 ```
 
 on your nexus file to generate an output file `experiment.stl`.
 The usage of the command is as follows:
 
 ```
-Usage: nexus2stl [OPTIONS] FILE
+Usage: nexus3d [OPTIONS] FILE
 
   Create a stl from a nexus file via the command line
 
