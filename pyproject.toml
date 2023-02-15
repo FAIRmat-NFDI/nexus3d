@@ -32,6 +32,7 @@ dev = [
     "pycodestyle",
     "pytest",
     "pytest-cov",
+    "scipy",
 ]
 
 [project.scripts]
