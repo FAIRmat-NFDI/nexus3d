@@ -29,9 +29,6 @@ def transformation_matrices_from(
             if req_attr not in attrs:
                 raise ValueError(f"`{req_attr}` attribute not found in {entry}")
 
-        if attrs["depends_on"] == ".":
-            return np.identity(4)
-
         if "offset" in attrs and "offsets_units" not in attrs:
             raise ValueError(
                 f"Found `offset` attribute in {entry} but no `offset_units` could be found."
@@ -57,6 +54,9 @@ def transformation_matrices_from(
             raise ValueError(
                 f"Unknown transformation type `{attrs['transformation_type']}`"
             )
+
+        if attrs["depends_on"] == ".":
+            return matrix
 
         if "/" in attrs["depends_on"]:
             return matrix @ get_transformation_matrix(h5file, attrs["depends_on"])
