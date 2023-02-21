@@ -42,3 +42,15 @@ def coord_systems_from(
         )
 
     return coordinate_systems
+
+
+def unit_vector(vec: NDArray[np.float64]):
+    """Calculates an unit vector"""
+    return vec / np.linalg.norm(vec)
+
+
+def angle_between(vec1: NDArray[np.float64], vec2: NDArray[np.float64]):
+    """Calculate the angle between two vectors"""
+    uvec1 = unit_vector(vec1)
+    uvec2 = unit_vector(vec2)
+    return np.arccos(np.clip(np.dot(uvec1, uvec2), -1, 1))
