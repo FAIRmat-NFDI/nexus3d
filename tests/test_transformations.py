@@ -64,9 +64,11 @@ def test_angle_between():
     tmatrices = transformation_matrices_from(
         f"{path}/data/transformation_example.h5", False
     )
-    transformed_z = (np.linalg.inv(tmatrices["sample"]) @ np.array([0, 0, -1, 0]))[:-1]
+    transformed_z = (
+        np.linalg.inv(tmatrices["instrument/electronanalyser"]) @ np.array([0, 0, 1, 0])
+    )[:-1]
 
     assert_almost_equal(
         angle_between(transformed_z, np.array([0, 0, -1])) / np.pi * 180,
-        73.83582199422835,
+        65,
     )
