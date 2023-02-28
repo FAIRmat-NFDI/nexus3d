@@ -4,48 +4,7 @@ import numpy as np
 from numpy.typing import NDArray
 import pygltflib
 
-
-def get_cube_arrays(scale: float = 1):
-    """Get cube arrays for creating the cubes.
-
-    Args:
-        scale (float, optional): The scale of the cubes. Defaults to 1.
-
-    Returns:
-        (np.ndarray, np.ndarray): The points and triangles array of the cube.
-    """
-    points = np.array(
-        [
-            [-1, -1, -1],
-            [+1, -1, -1],
-            [+1, +1, -1],
-            [-1, +1, -1],
-            [-1, -1, +1],
-            [+1, -1, +1],
-            [+1, +1, +1],
-            [-1, +1, +1],
-        ],
-        dtype="float32",
-    )
-    triangles = np.array(
-        [
-            [0, 3, 1],
-            [1, 3, 2],
-            [0, 4, 7],
-            [0, 7, 3],
-            [4, 5, 6],
-            [4, 6, 7],
-            [5, 1, 2],
-            [5, 2, 6],
-            [2, 3, 6],
-            [3, 7, 6],
-            [0, 1, 5],
-            [0, 5, 4],
-        ],
-        dtype="uint8",
-    )
-
-    return points * scale, triangles
+from nexus3d.formats.cube_mesh import create_cube_arrays
 
 
 def get_binary_blobs(vertices: NDArray[np.float32], indices: NDArray[np.uint8]):
@@ -78,7 +37,7 @@ def write_gltf_file(
         scale (float, optional): The scale of the cubes. Defaults to 0.1.
         show_beam (bool, optional): Whether to show the beam in the gltf file. Defaults to True.
     """
-    points, triangles = get_cube_arrays(scale / 2)
+    points, triangles = create_cube_arrays(scale / 2)
     points_binary_blob, triangles_binary_blob = get_binary_blobs(points, triangles)
 
     nodes = []
