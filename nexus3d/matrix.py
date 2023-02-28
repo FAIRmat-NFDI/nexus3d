@@ -53,7 +53,7 @@ def rotate(
 def translate(
     translation: NDArray[np.float64], offset: Optional[NDArray[np.float64]] = None
 ) -> NDArray[np.float64]:
-    """Generation a 4D translation matrix.
+    """Generates a 4D translation matrix.
 
     Returns:
         np.ndarray[(4, 4), float]: The translation matrix.

@@ -1,4 +1,5 @@
 """Create a stl from NXtransformation groups"""
+import os
 from sys import version_info
 from os import path
 from typing import Dict
@@ -6,11 +7,10 @@ import numpy as np
 from numpy.typing import NDArray
 import h5py
 from pint import UnitRegistry
-from stl import mesh
 import click
 
 from nexus3d.matrix import rotate, translate
-from nexus3d.cube_mesh import create_cube_mesh
+from nexus3d.formats.stl_mesh import write_file
 
 ureg = UnitRegistry()
 
@@ -91,32 +91,6 @@ def transformation_matrices_from(
     return transformation_matrices
 
 
-def cube_meshs_from(
-    transformation_matrices: Dict[str, NDArray[np.float64]], scale: float = 0.1
-) -> mesh.Mesh:
-    """Creates a composed cube mesh for a dict of transformation matrices.
-
-    Args:
-        transformation_matrices (Dict[str, np.ndarray[): The transformation matrix dict.
-        scale (float): The scale of the cubes. Defaults to 0.1.
-
-    Returns:
-        mesh: The composed mesh containing a cube for each transformation matrix.
-    """
-    # pylint: disable=redefined-outer-name
-    scene = None
-    for transformation_matrix in transformation_matrices.values():
-        cube = create_cube_mesh(scale)
-        cube.transform(transformation_matrix)
-
-        if scene is None:
-            scene = cube.data
-            continue
-        scene = np.concatenate((scene, cube.data))
-
-    return mesh.Mesh(scene)
-
-
 @click.command()
 @click.argument("file")
 @click.option(
@@ -162,12 +136,26 @@ def cli(file: str, output: str, force: bool, size: float, include_process: bool)
     if path.exists(output) and not force:
         raise click.FileError(output, hint="File already exists. Use -f to overwrite.")
 
+    file_format = os.path.splitext(output)[1]
+    if file_format not in [".stl", ".gltf", ".glb"]:
+        raise click.UsageError(
+            message=f"Unsupported file format {file_format} in output file `{output}`"
+        )
+
     if size <= 0:
         raise click.BadOptionUsage(
             "size", f"Not a valid size: {size}. Size needs to be > 0."
         )
 
-    scene = cube_meshs_from(
-        transformation_matrices_from(file, include_process), size / 2
+    def format_not_implemented(output: str, *_args, **_kwargs):
+        raise NotImplementedError(
+            f"Cannot write to format {file_format} for output file {output}"
+        )
+
+    format_map = {
+        ".stl": write_file,
+    }
+
+    format_map.get(file_format, format_not_implemented)(
+        output, transformation_matrices_from(file, include_process), size
     )
-    scene.save(output)
