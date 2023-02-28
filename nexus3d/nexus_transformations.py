@@ -2,7 +2,7 @@
 import os
 from sys import version_info
 from os import path
-from typing import Dict
+from typing import Callable, Dict
 import numpy as np
 from numpy.typing import NDArray
 import h5py
@@ -153,7 +153,9 @@ def cli(file: str, output: str, force: bool, size: float, include_process: bool)
             f"Cannot write to format {file_format} for output file {output}"
         )
 
-    format_map = {
+    format_map: Dict[
+        str, Callable[[str, Dict[str, NDArray[np.float64]], float], None]
+    ] = {
         ".stl": write_stl_file,
         ".gltf": write_gltf_file,
         ".glb": write_gltf_file,
