@@ -40,10 +40,12 @@ The usage of the command is as follows:
 ```
 Usage: nexus3d [OPTIONS] FILE
 
-  Create a stl from a nexus file via the command line
+  Create a glb/gltf or stl from a nexus file via the command line. The actual
+  file format is chosen from the file ending of the output file (default:
+  experiment.glb).
 
 Options:
-  -o, --output TEXT  The filename to write to (default: experiment.stl).
+  -o, --output TEXT  The filename to write to (default: experiment.glb).
   -s, --size FLOAT   The side length of a cube in meters. (default: 0.1 m).
   -f, --force        Force overwriting of output file.
   --include-process  Include transformations inside /entry/process

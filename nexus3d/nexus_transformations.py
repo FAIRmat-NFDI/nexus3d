@@ -97,8 +97,8 @@ def transformation_matrices_from(
 @click.option(
     "-o",
     "--output",
-    default="experiment.stl",
-    help="The filename to write to (default: experiment.stl).",
+    default="experiment.glb",
+    help="The filename to write to (default: experiment.glb).",
 )
 @click.option(
     "-s",
@@ -123,7 +123,11 @@ def transformation_matrices_from(
     help="Include transformations inside /entry/process",
 )
 def cli(file: str, output: str, force: bool, size: float, include_process: bool):
-    """Create a stl from a nexus file via the command line"""
+    """
+    Create a glb/gltf or stl from a nexus file via the command line.
+    The actual file format is chosen from the
+    file ending of the output file (default: experiment.glb).
+    """
 
     if not path.exists(file):
         raise click.FileError(file, hint="File does not exist.")
