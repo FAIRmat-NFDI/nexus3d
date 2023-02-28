@@ -68,7 +68,7 @@ def write_gltf_file(
     filename: str,
     transformation_matrices: Dict[str, NDArray[np.float64]],
     scale: float = 0.1,
-    show_beam: bool = True,
+    show_beam: bool = True,  # pylint: disable=unused-argument
 ):
     """Writes a cube mesh from the transformation matrices to a gltf file.
 
@@ -91,15 +91,6 @@ def write_gltf_file(
     indices = np.array([[0, 1]], dtype="uint8")
     lines_binary, indices_binary = get_binary_blobs(lines, indices)
 
-    # mesh primitive modes
-    # ◦ 0 POINTS
-    # ◦ 1 LINES
-    # ◦ 2 LINE_LOOP
-    # ◦ 3 LINE_STRIP
-    # ◦ 4 TRIANGLES
-    # ◦ 5 TRIANGLE_STRIP ◦ 6 TRIANGLE_FAN
-
-
     gltf = pygltflib.GLTF2(
         scene=0,
         scenes=[pygltflib.Scene(nodes=[0])],
@@ -115,10 +106,12 @@ def write_gltf_file(
             pygltflib.Mesh(
                 primitives=[
                     pygltflib.Primitive(
-                        attributes=pygltflib.Attributes(POSITION=3), indices=2, mode=1,
+                        attributes=pygltflib.Attributes(POSITION=3),
+                        indices=2,
+                        mode=1,
                     )
                 ]
-            )
+            ),
         ],
         accessors=[
             pygltflib.Accessor(
@@ -168,13 +161,15 @@ def write_gltf_file(
             ),
             pygltflib.BufferView(
                 buffer=0,
-                byteOffset=len(triangles_binary_blob)+len(points_binary_blob),
+                byteOffset=len(triangles_binary_blob) + len(points_binary_blob),
                 byteLength=len(indices_binary),
                 target=pygltflib.ELEMENT_ARRAY_BUFFER,
             ),
             pygltflib.BufferView(
                 buffer=0,
-                byteOffset=len(triangles_binary_blob)+len(points_binary_blob)+len(indices_binary),
+                byteOffset=len(triangles_binary_blob)
+                + len(points_binary_blob)
+                + len(indices_binary),
                 byteLength=len(lines_binary),
                 target=pygltflib.ARRAY_BUFFER,
             ),
@@ -182,12 +177,16 @@ def write_gltf_file(
         buffers=[
             pygltflib.Buffer(
                 byteLength=(
-                    len(triangles_binary_blob)+len(points_binary_blob)
-                    +len(indices_binary)+len(lines_binary)
+                    len(triangles_binary_blob)
+                    + len(points_binary_blob)
+                    + len(indices_binary)
+                    + len(lines_binary)
                 )
             ),
         ],
     )
-    gltf.set_binary_blob(triangles_binary_blob + points_binary_blob + indices_binary + lines_binary)
+    gltf.set_binary_blob(
+        triangles_binary_blob + points_binary_blob + indices_binary + lines_binary
+    )
 
     gltf.save(filename)
