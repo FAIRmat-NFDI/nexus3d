@@ -1,4 +1,4 @@
-"""Functions for creating a cube mesh"""
+"""Functions for creating a stl cube mesh file"""
 from typing import Dict
 import numpy as np
 from numpy.typing import NDArray
@@ -66,7 +66,6 @@ def cube_meshs_from(
     Returns:
         mesh: The composed mesh containing a cube for each transformation matrix.
     """
-    # pylint: disable=redefined-outer-name
     scene = None
     for transformation_matrix in transformation_matrices.values():
         cube = create_cube_mesh(scale)
@@ -80,7 +79,7 @@ def cube_meshs_from(
     return mesh.Mesh(scene)
 
 
-def write_file(
+def write_stl_file(
     filename: str,
     transformation_matrices: Dict[str, NDArray[np.float64]],
     scale: float = 0.1,
@@ -88,7 +87,7 @@ def write_file(
     """Writes a cube mesh from the transformation matrices to a stl file.
 
     Args:
-        filename (str): _description_
+        filename (str): The filename to write to.
         transformation_matrices (Dict[str, NDArray[np.float64]]): The transformation matrix dict.
         scale (float, optional): The scale of the cubes. Defaults to 0.1.
     """

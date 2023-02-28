@@ -10,7 +10,8 @@ from pint import UnitRegistry
 import click
 
 from nexus3d.matrix import rotate, translate
-from nexus3d.formats.stl_mesh import write_file
+from nexus3d.formats.stl_cube_mesh import write_stl_file
+from nexus3d.formats.gltf_cube_mesh import write_gltf_file
 
 ureg = UnitRegistry()
 
@@ -153,7 +154,9 @@ def cli(file: str, output: str, force: bool, size: float, include_process: bool)
         )
 
     format_map = {
-        ".stl": write_file,
+        ".stl": write_stl_file,
+        ".gltf": write_gltf_file,
+        ".glb": write_gltf_file,
     }
 
     format_map.get(file_format, format_not_implemented)(

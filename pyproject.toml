@@ -23,6 +23,7 @@ dependencies = [
     "pint",
     "numpy-stl",
     "click",
+    "pygltflib",
 ]
 
 [project.optional-dependencies]
