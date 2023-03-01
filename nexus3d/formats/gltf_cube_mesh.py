@@ -41,10 +41,10 @@ def write_gltf_file(
     points_binary_blob, triangles_binary_blob = get_binary_blobs(points, triangles)
 
     nodes = []
-    for matrix in transformation_matrices.values():
-        nodes.append(pygltflib.Node(mesh=0, matrix=list(matrix.T.flat)))
+    for name, matrix in transformation_matrices.items():
+        nodes.append(pygltflib.Node(mesh=0, matrix=list(matrix.T.flat), name=name))
 
-    nodes.append(pygltflib.Node(mesh=1))
+    nodes.append(pygltflib.Node(mesh=1, name="beam"))
 
     lines = np.array([[0, 0, 0], [0, 0, -1]], dtype="float32")
     indices = np.array([[0, 1]], dtype="uint8")

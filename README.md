@@ -34,7 +34,7 @@ Execute
 nexus3d nexus_file.nxs
 ```
 
-on your nexus file to generate an output file `experiment.stl`.
+on your nexus file to generate an output file `experiment.glb`.
 The usage of the command is as follows:
 
 ```

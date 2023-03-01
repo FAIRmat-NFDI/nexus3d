@@ -60,10 +60,13 @@ def transformation_matrices_from(
             return matrix
 
         if "/" in attrs["depends_on"]:
-            return matrix @ get_transformation_matrix(h5file, attrs["depends_on"])
+            return get_transformation_matrix(h5file, attrs["depends_on"]) @ matrix
 
-        return matrix @ get_transformation_matrix(
-            h5file, f"{entry.rsplit('/', 1)[0]}/{attrs['depends_on']}"
+        return (
+            get_transformation_matrix(
+                h5file, f"{entry.rsplit('/', 1)[0]}/{attrs['depends_on']}"
+            )
+            @ matrix
         )
 
     def get_transformation_group_names(name: str, dataset: h5py.Dataset):

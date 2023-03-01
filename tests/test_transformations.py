@@ -33,7 +33,7 @@ def test_correct_chain_resolution_from_nexus():
         m_rot_z = rotate(np.deg2rad(-25), np.array([0, 0, 1]))
         m_trans_z = translate(-0.32 * np.array([0, 0, 1]))
 
-        return m_trans_z @ m_rot_z @ m_rot_x
+        return m_rot_x @ m_rot_z @ m_trans_z
 
     def get_sample_trafo():
         trans_x = translate(2.65e-3 * np.array([1, 0, 0]))
@@ -45,21 +45,21 @@ def test_correct_chain_resolution_from_nexus():
         corrected_phi = rotate(np.deg2rad(90), np.array([0, 1, 0]))
 
         return (
-            corrected_phi
-            @ rot_omg
-            @ rot_phi
-            @ rot_tht
-            @ trans_z
-            @ trans_y
+            get_manipulator_trafo()
             @ trans_x
-            @ get_manipulator_trafo()
+            @ trans_y
+            @ trans_z
+            @ rot_tht
+            @ rot_phi
+            @ rot_omg
+            @ corrected_phi
         )
 
     def get_analyser_trafo():
         a_rot_y = rotate(np.deg2rad(-115), np.array([0, 1, 0]))
         a_trans_z = translate(4e-3 * np.array([0, 0, 1]))
 
-        return a_trans_z @ a_rot_y
+        return a_rot_y @ a_trans_z
 
     path = os.getenv("PYTEST_CURRENT_TEST").rsplit("/", 1)[0]
     tmatrices = transformation_matrices_from(
