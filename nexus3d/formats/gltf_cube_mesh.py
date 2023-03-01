@@ -118,16 +118,27 @@ def write_gltf_file(
         scale (float, optional): The scale of the cubes. Defaults to 0.1.
         show_beam (bool, optional): Whether to show the beam in the gltf file. Defaults to True.
     """
-    if isinstance(next(iter(transformation_matrices.values())), list):
-        raise NotImplementedError(
-            "Storage of intermediate matrices is not yet implemented for gltf/glb files."
-        )
 
     def append_nodes():
         for name, matrix in transformation_matrices.items():
-            gltf.nodes.append(
-                pygltflib.Node(mesh=0, matrix=list(matrix.T.flat), name=name)
-            )
+            children = []
+            if isinstance(matrix, list):
+                for j, cmat in enumerate(matrix):
+                    gltf.nodes.append(
+                        pygltflib.Node(
+                            mesh=0, matrix=list(cmat.T.flat), name=f"{name}.{j}"
+                        )
+                    )
+                    children.append(len(gltf.nodes) - 1)
+
+            gltf.nodes.append(pygltflib.Node(mesh=0, name=name))
+
+            if children:
+                gltf.nodes[-1].children = children
+            else:
+                gltf.nodes[-1].matrix = list(matrix.T.flat)
+
+            gltf.scenes[gltf.scene].nodes.append(len(gltf.nodes) - 1)
 
     def append_mesh(mode: int = 4):
         gltf.meshes.append(
@@ -144,7 +155,7 @@ def write_gltf_file(
 
     gltf = pygltflib.GLTF2(
         scene=0,
-        scenes=[pygltflib.Scene(nodes=[0])],
+        scenes=[pygltflib.Scene(nodes=[])],
     )
 
     append_nodes()
@@ -159,6 +170,8 @@ def write_gltf_file(
         vertices.append(np.array([[0, 0, 0], [0, 0, -1]], dtype="float32"))
         indices.append(np.array([[0, 1]], dtype="uint8"))
         gltf.nodes.append(pygltflib.Node(mesh=1, name="beam"))
+
+        gltf.scenes[gltf.scene].nodes.append(len(gltf.nodes) - 1)
 
         append_mesh(mode=1)
 
