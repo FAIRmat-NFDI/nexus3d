@@ -11,7 +11,7 @@ def create_cube_arrays(scale: float = 1):
     Returns:
         (np.ndarray, np.ndarray): The points and triangles array of the cube.
     """
-    points = np.array(
+    vertices = np.array(
         [
             [-1, -1, -1],
             [+1, -1, -1],
@@ -24,7 +24,7 @@ def create_cube_arrays(scale: float = 1):
         ],
         dtype="float32",
     )
-    triangles = np.array(
+    indices = np.array(
         [
             [0, 3, 1],
             [1, 3, 2],
@@ -42,4 +42,4 @@ def create_cube_arrays(scale: float = 1):
         dtype="uint8",
     )
 
-    return points * scale, triangles
+    return indices, vertices * scale

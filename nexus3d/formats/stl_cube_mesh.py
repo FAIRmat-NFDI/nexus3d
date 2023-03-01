@@ -16,10 +16,10 @@ def create_cube_mesh(scale: float = 1.0):
     Returns:
         stl.mesh: The cube mesh at the origin
     """
-    vertices, faces = create_cube_arrays(scale)
+    indices, vertices = create_cube_arrays(scale)
 
-    cube = mesh.Mesh(np.zeros(faces.shape[0], dtype=mesh.Mesh.dtype))
-    for i, face in enumerate(faces):
+    cube = mesh.Mesh(np.zeros(indices.shape[0], dtype=mesh.Mesh.dtype))
+    for i, face in enumerate(indices):
         for j in range(3):
             cube.vectors[i][j] = vertices[face[j], :]
 
