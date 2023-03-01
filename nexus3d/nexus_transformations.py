@@ -2,7 +2,7 @@
 import os
 from sys import version_info
 from os import path
-from typing import Callable, Dict
+from typing import Callable, Dict, List, Mapping, Union
 import numpy as np
 from numpy.typing import NDArray
 import h5py
@@ -15,12 +15,22 @@ from nexus3d.formats.gltf_cube_mesh import write_gltf_file
 
 ureg = UnitRegistry()
 
+TransformationMatrixDict = Mapping[
+    str, Union[List[NDArray[np.float64]], NDArray[np.float64]]
+]
+
 
 def transformation_matrices_from(
-    fname: str, include_process: bool
-) -> Dict[str, NDArray[np.float64]]:
+    fname: str, include_process: bool, store_intermediate: bool = False
+) -> TransformationMatrixDict:
     """Reads all NXtransformations from a nexus file
     and creates a transformation matrix from them."""
+
+    def store_in_chain(matrix: NDArray[np.float64]):
+        if store_intermediate:
+            matrix_chain.append(matrix)
+
+        return matrix
 
     def get_transformation_matrix(h5file: h5py.File, entry: str):
         required_attrs = ["depends_on", "vector", "transformation_type", "units"]
@@ -57,12 +67,14 @@ def transformation_matrices_from(
             )
 
         if attrs["depends_on"] == ".":
-            return matrix
+            return store_in_chain(matrix)
 
         if "/" in attrs["depends_on"]:
-            return get_transformation_matrix(h5file, attrs["depends_on"]) @ matrix
+            return store_in_chain(
+                get_transformation_matrix(h5file, attrs["depends_on"]) @ matrix
+            )
 
-        return (
+        return store_in_chain(
             get_transformation_matrix(
                 h5file, f"{entry.rsplit('/', 1)[0]}/{attrs['depends_on']}"
             )
@@ -86,11 +98,16 @@ def transformation_matrices_from(
         h5file.visititems(get_transformation_group_names)
 
         for name, transformation_group in transformation_groups.items():
+            if store_intermediate:
+                matrix_chain: List[NDArray[np.float64]] = []
+
             transformation_matrix = get_transformation_matrix(
                 h5file, transformation_group
             )
 
-            transformation_matrices[name] = transformation_matrix
+            transformation_matrices[name] = (
+                matrix_chain if store_intermediate else transformation_matrix
+            )
 
     return transformation_matrices
 
@@ -125,7 +142,24 @@ def transformation_matrices_from(
     type=bool,
     help="Include transformations inside /entry/process",
 )
-def cli(file: str, output: str, force: bool, size: float, include_process: bool):
+@click.option(
+    "--store-intermediate",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help=(
+        "Store the intermediate matrices in gltf child nodes. "
+        "Only applicable for gltf or glb files."
+    ),
+)
+def cli(  # pylint: disable=too-many-arguments
+    file: str,
+    output: str,
+    force: bool,
+    size: float,
+    include_process: bool,
+    store_intermediate: bool,
+):
     """
     Create a glb/gltf or stl from a nexus file via the command line.
     The actual file format is chosen from the
@@ -160,14 +194,14 @@ def cli(file: str, output: str, force: bool, size: float, include_process: bool)
             f"Cannot write to format {file_format} for output file {output}"
         )
 
-    format_map: Dict[
-        str, Callable[[str, Dict[str, NDArray[np.float64]], float], None]
-    ] = {
+    format_map: Dict[str, Callable[[str, TransformationMatrixDict, float], None]] = {
         ".stl": write_stl_file,
         ".gltf": write_gltf_file,
         ".glb": write_gltf_file,
     }
 
     format_map.get(file_format, format_not_implemented)(
-        output, transformation_matrices_from(file, include_process), size
+        output,
+        transformation_matrices_from(file, include_process, store_intermediate),
+        size,
     )

@@ -45,9 +45,11 @@ Usage: nexus3d [OPTIONS] FILE
   experiment.glb).
 
 Options:
-  -o, --output TEXT  The filename to write to (default: experiment.glb).
-  -s, --size FLOAT   The side length of a cube in meters. (default: 0.1 m).
-  -f, --force        Force overwriting of output file.
-  --include-process  Include transformations inside /entry/process
-  --help             Show this message and exit.
+  -o, --output TEXT     The filename to write to (default: experiment.glb).
+  -s, --size FLOAT      The side length of a cube in meters. (default: 0.1 m).
+  -f, --force           Force overwriting of output file.
+  --include-process     Include transformations inside /entry/process
+  --store-intermediate  Store the intermediate matrices in gltf child nodes.
+                        Only applicable for gltf or glb files.
+  --help                Show this message and exit.
 ```

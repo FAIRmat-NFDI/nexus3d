@@ -1,10 +1,14 @@
 """Functions for creating a gltf cube mesh file"""
-from typing import Dict, List
+from typing import List, Mapping, Union
 import numpy as np
 from numpy.typing import NDArray
 import pygltflib
 
 from nexus3d.formats.cube_mesh import create_cube_arrays
+
+TransformationMatrixDict = Mapping[
+    str, Union[List[NDArray[np.float64]], NDArray[np.float64]]
+]
 
 
 def get_binary_blobs(indices: NDArray[np.uint8], vertices: NDArray[np.float32]):
@@ -102,7 +106,7 @@ def set_data(
 
 def write_gltf_file(
     filename: str,
-    transformation_matrices: Dict[str, NDArray[np.float64]],
+    transformation_matrices: TransformationMatrixDict,
     scale: float = 0.1,
     show_beam: bool = True,
 ):
@@ -110,10 +114,14 @@ def write_gltf_file(
 
     Args:
         filename (str): The filename to write to.
-        transformation_matrices (Dict[str, NDArray[np.float64]]): The transformation matrix dict.
+        transformation_matrices (TransformationMatrixDict): The transformation matrix dict.
         scale (float, optional): The scale of the cubes. Defaults to 0.1.
         show_beam (bool, optional): Whether to show the beam in the gltf file. Defaults to True.
     """
+    if isinstance(next(iter(transformation_matrices.values())), list):
+        raise NotImplementedError(
+            "Storage of intermediate matrices is not yet implemented for gltf/glb files."
+        )
 
     def append_nodes():
         for name, matrix in transformation_matrices.items():
