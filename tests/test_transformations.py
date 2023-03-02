@@ -96,7 +96,8 @@ def test_full_chain_extraction(tmatrices, example_file_path):
     assert len(tmatrices_chain["instrument/electronanalyser"]) == 2
 
     for entry, matrix in tmatrices.items():
-        assert_array_almost_equal(matrix, tmatrices_chain[entry][-1])
+        last_matrix = tmatrices_chain[entry][next(reversed(tmatrices_chain[entry]))]
+        assert_array_almost_equal(matrix, last_matrix)
 
 
 def test_angle_between(tmatrices):

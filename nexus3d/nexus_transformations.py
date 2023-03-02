@@ -1,4 +1,5 @@
 """Create a stl from NXtransformation groups"""
+from collections import OrderedDict
 import os
 from sys import version_info
 from os import path
@@ -100,7 +101,7 @@ def transformation_matrices_from(
 
         for name, transformation_group in transformation_groups.items():
             if store_intermediate:
-                matrix_chain: Dict[str, NDArray[np.float64]] = {}
+                matrix_chain: Dict[str, NDArray[np.float64]] = OrderedDict()
 
             transformation_matrix = get_transformation_matrix(
                 h5file, transformation_group
