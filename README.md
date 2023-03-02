@@ -1,7 +1,7 @@
 # Scope
 
 This is a project for reading out NX_TRANSFORMATION matrices from nexus files and
-visualizing them by creating a 3D representation file (e.g. stl or gltf) which may be importet into 3D visualization software.
+visualizing them by creating a 3D representation file (e.g. stl or gltf) which may be imported into 3D visualization software.
 
 # Install
 

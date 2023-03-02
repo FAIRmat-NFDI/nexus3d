@@ -1,5 +1,6 @@
 """Create a stl from NXtransformation groups"""
 from collections import OrderedDict
+import json
 import os
 from sys import version_info
 from os import path
@@ -9,6 +10,7 @@ from numpy.typing import NDArray
 import h5py
 from pint import UnitRegistry
 import click
+from nexus3d.formats.interfaces import WriterInput
 
 from nexus3d.matrix import rotate, translate
 from nexus3d.formats.stl_cube_mesh import write_stl_file
@@ -123,6 +125,12 @@ def transformation_matrices_from(
     help="The filename to write to (default: experiment.glb).",
 )
 @click.option(
+    "-c",
+    "--config",
+    default="",
+    help="Config file to load stl drawings into the final output",
+)
+@click.option(
     "-s",
     "--size",
     default=0.1,
@@ -156,6 +164,7 @@ def transformation_matrices_from(
 )
 def cli(  # pylint: disable=too-many-arguments
     file: str,
+    config: str,
     output: str,
     force: bool,
     size: float,
@@ -169,16 +178,18 @@ def cli(  # pylint: disable=too-many-arguments
     """
 
     if not path.exists(file):
-        raise click.FileError(file, hint="File does not exist.")
+        raise click.FileError(file, hint=f"File `{file}` does not exist.")
 
     if not path.isfile(file):
-        raise click.FileError(file, hint="Is not a file.")
+        raise click.FileError(file, hint=f"`{file}` is not a file.")
 
     if not h5py.is_hdf5(file):
-        raise click.FileError(file, hint="Not a valid HDF5 file.")
+        raise click.FileError(file, hint=f"`{file}` is not a valid HDF5 file.")
 
     if path.exists(output) and not force:
-        raise click.FileError(output, hint="File already exists. Use -f to overwrite.")
+        raise click.FileError(
+            output, hint=f"File `{output}` already exists. Use -f to overwrite."
+        )
 
     file_format = os.path.splitext(output)[1]
     if file_format not in [".stl", ".gltf", ".glb"]:
@@ -186,24 +197,42 @@ def cli(  # pylint: disable=too-many-arguments
             message=f"Unsupported file format {file_format} in output file `{output}`"
         )
 
+    if config and (not path.exists(config) or not path.isfile(config)):
+        raise click.FileError(
+            file, hint=f"Config file `{config}` does not exist or is not valid."
+        )
+
+    if config and os.path.splitext(config)[1] != ".json":
+        raise click.FileError(file, hint=f"Config file `{config}` must be a json file.")
+
     if size <= 0:
         raise click.BadOptionUsage(
             "size", f"Not a valid size: {size}. Size needs to be > 0."
         )
 
-    def format_not_implemented(output: str, *_args, **_kwargs):
+    def format_not_implemented(cli_input: WriterInput):
         raise NotImplementedError(
-            f"Cannot write to format {file_format} for output file {output}"
+            f"Cannot write to format {file_format} for output file {cli_input.output}"
         )
 
-    format_map: Dict[str, Callable[[str, TransformationMatrixDict, float], None]] = {
+    config_dict = {}
+    if config:
+        config_dict = json.loads(config)
+
+    format_map: Dict[str, Callable[[WriterInput], None]] = {
         ".stl": write_stl_file,
         ".gltf": write_gltf_file,
         ".glb": write_gltf_file,
     }
 
     format_map.get(file_format, format_not_implemented)(
-        output,
-        transformation_matrices_from(file, include_process, store_intermediate),
-        size,
+        WriterInput(
+            output=output,
+            transformation_matrices=transformation_matrices_from(
+                file, include_process, store_intermediate
+            ),
+            size=size,
+            show_beam=True,
+            config_dict=config_dict,
+        )
     )

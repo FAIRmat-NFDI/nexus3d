@@ -5,11 +5,12 @@ import numpy as np
 from numpy.typing import NDArray
 import pygltflib
 
-from nexus3d.formats.cube_mesh import create_cube_arrays
+from nexus3d.formats.cube_mesh import create_cube_arrays, get_mesh_from_stl
+from nexus3d.formats.interfaces import WriterInput
+from nexus3d.matrix import translate
 
-TransformationMatrixDict = Mapping[
-    str, Union[Dict[str, NDArray[np.float64]], NDArray[np.float64]]
-]
+TransformationMatrix = Union[Dict[str, NDArray[np.float64]], NDArray[np.float64]]
+TransformationMatrixDict = Mapping[str, TransformationMatrix]
 
 
 def get_binary_blobs(indices: NDArray[np.uint8], vertices: NDArray[np.float32]):
@@ -105,12 +106,34 @@ def set_data(
     gltf.set_binary_blob(binary_data)
 
 
-def write_gltf_file(
-    filename: str,
-    transformation_matrices: TransformationMatrixDict,
-    scale: float = 0.1,
-    show_beam: bool = True,
-):
+def clean_name(name: str, entry_name: str):
+    """Cleans the name of a matrix path.
+
+    Args:
+        name (str): The name of the transformation path
+        entry_name (str): The name of the current entry
+    """
+
+    def remove_prefix(text, prefix):
+        if text.startswith(prefix):
+            return text[len(prefix) :]
+        return text
+
+    if version_info.minor < 9:
+        return remove_prefix(
+            remove_prefix(remove_prefix(name, "/entry/"), entry_name),
+            "/transformations/",
+        ).replace("/transformations", "")
+
+    return (
+        name.removeprefix("/entry/")
+        .removeprefix(entry_name)
+        .removeprefix("/transformations/")
+        .replace("/transformations", "")
+    )
+
+
+def write_gltf_file(cli_input: WriterInput):
     """Writes a cube mesh from the transformation matrices to a gltf file.
 
     Args:
@@ -120,33 +143,33 @@ def write_gltf_file(
         show_beam (bool, optional): Whether to show the beam in the gltf file. Defaults to True.
     """
 
-    def clean_name(name: str, entry_name: str):
-        def remove_prefix(text, prefix):
-            if text.startswith(prefix):
-                return text[len(prefix) :]
-            return text
+    def add_stl_shift(name: str, matrix: TransformationMatrix) -> TransformationMatrix:
+        if name not in cli_input.config_dict:
+            return matrix
 
-        if version_info.minor < 9:
-            return remove_prefix(
-                remove_prefix(remove_prefix(name, "/entry/"), entry_name),
-                "/transformatios/",
-            ).replace("/transformations", "")
+        translations = np.zeros(3)
+        if name in cli_input.config_dict:
+            for i, axis in enumerate(["x", "y", "z"]):
+                translations[i] = cli_input.config_dict[name].get(axis, 0)
 
-        return (
-            name.removeprefix("/entry/")
-            .removeprefix(entry_name)
-            .removeprefix("/transformations/")
-            .replace("/transformations", "")
-        )
+        if isinstance(matrix, dict):
+            matrix["stl_shift"] = matrix[next(reversed(matrix))] @ translate(
+                translations
+            )
+            return matrix
 
-    def append_nodes():
-        for name, matrix in transformation_matrices.items():
+        return matrix @ translate(translations)
+
+    def append_nodes(mesh_indices: Dict[str, int]):
+        for name, matrix in cli_input.transformation_matrices.items():
             children = []
             if isinstance(matrix, dict):
-                for j, (cname, cmat) in enumerate(matrix.items()):
+                for j, (cname, cmat) in enumerate(
+                    add_stl_shift(name, matrix).items()  # type: ignore
+                ):
                     gltf.nodes.append(
                         pygltflib.Node(
-                            mesh=0,
+                            mesh=mesh_indices[name],
                             matrix=list(cmat.T.flat),
                             name=f"{j}-{clean_name(cname, name)}",
                         )
@@ -158,7 +181,9 @@ def write_gltf_file(
             if children:
                 gltf.nodes[-1].children = children
             else:
-                gltf.nodes[-1].matrix = list(matrix.T.flat)
+                gltf.nodes[-1].matrix = list(
+                    add_stl_shift(name, matrix).T.flat  # type: ignore
+                )
 
             gltf.scenes[gltf.scene].nodes.append(len(gltf.nodes) - 1)
 
@@ -175,20 +200,46 @@ def write_gltf_file(
             ),
         )
 
+    def create_meshs():
+        mesh_indices = {}
+        cube_index = None
+        for name in cli_input.transformation_matrices:
+            if name in cli_input.config_dict and "file" in cli_input.config_dict[name]:
+                stl_indices, stl_vertices = get_mesh_from_stl(
+                    cli_input.config_dict[name]["file"]
+                )
+
+                indices.append(stl_indices)
+                vertices.append(stl_vertices)
+                mesh_indices[name] = len(vertices) - 1
+                append_mesh()
+                continue
+
+            if cube_index is None:
+                cube_indices, cube_vertices = create_cube_arrays(cli_input.size / 2)
+                indices.append(cube_indices)
+                vertices.append(cube_vertices)
+                cube_index = len(vertices) - 1
+                append_mesh()
+            mesh_indices[name] = cube_index
+
+        return mesh_indices
+
+    if cli_input.config_dict is None:
+        cli_input.config_dict = {}
+
     gltf = pygltflib.GLTF2(
         scene=0,
         scenes=[pygltflib.Scene(nodes=[])],
     )
 
-    append_nodes()
+    indices = []
+    vertices = []
+    mesh_indices = create_meshs()
 
-    cube_indices, cube_vertices = create_cube_arrays(scale / 2)
-    indices = [cube_indices]
-    vertices = [cube_vertices]
+    append_nodes(mesh_indices)
 
-    append_mesh()
-
-    if show_beam:
+    if cli_input.show_beam:
         vertices.append(np.array([[0, 0, 0], [0, 0, -1]], dtype="float32"))
         indices.append(np.array([[0, 1]], dtype="uint8"))
         gltf.nodes.append(pygltflib.Node(mesh=1, name="beam"))
@@ -199,4 +250,4 @@ def write_gltf_file(
 
     set_data(gltf, indices, vertices)
 
-    gltf.save(filename)
+    gltf.save(cli_input.output)

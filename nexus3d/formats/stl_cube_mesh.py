@@ -5,6 +5,7 @@ from numpy.typing import NDArray
 from stl import mesh
 
 from nexus3d.formats.cube_mesh import create_cube_arrays
+from nexus3d.formats.interfaces import WriterInput
 
 TransformationMatrixDict = Mapping[
     str, Union[Dict[str, NDArray[np.float64]], NDArray[np.float64]]
@@ -55,11 +56,7 @@ def cube_meshs_from(
     return mesh.Mesh(scene)
 
 
-def write_stl_file(
-    filename: str,
-    transformation_matrices: TransformationMatrixDict,
-    scale: float = 0.1,
-):
+def write_stl_file(cli_input: WriterInput):
     """Writes a cube mesh from the transformation matrices to a stl file.
 
     Args:
@@ -67,10 +64,10 @@ def write_stl_file(
         transformation_matrices (Dict[str, NDArray[np.float64]]): The transformation matrix dict.
         scale (float, optional): The scale of the cubes. Defaults to 0.1.
     """
-    if isinstance(next(iter(transformation_matrices.values())), dict):
+    if isinstance(next(iter(cli_input.transformation_matrices.values())), dict):
         raise NotImplementedError(
             "Storage of intermediate matrices is not supported for stl files."
         )
 
-    scene = cube_meshs_from(transformation_matrices, scale / 2)
-    scene.save(filename)
+    scene = cube_meshs_from(cli_input.transformation_matrices, cli_input.size / 2)
+    scene.save(cli_input.output)

@@ -1,6 +1,7 @@
 """Creates test files for rotation and translation for reference."""
 import numpy as np
 from nexus3d.formats.gltf_cube_mesh import write_gltf_file
+from nexus3d.formats.interfaces import WriterInput
 from nexus3d.matrix import rotate, translate
 
 
@@ -16,7 +17,13 @@ def create_rot_test_file(angle: float = 20, gltf: bool = False):
     for name, rot_vec in rot_vecs.items():
         rotation_matrices[name] = rotate(np.deg2rad(angle), rot_vec)
 
-    write_gltf_file("rot.gltf" if gltf else "rot.glb", rotation_matrices, 0.1)
+    write_gltf_file(
+        WriterInput(
+            output="rot.gltf" if gltf else "rot.glb",
+            transformation_matrices=rotation_matrices,
+            size=0.1,
+        )
+    )
 
 
 def create_trans_test_file(distance: float = 0.1, gltf: bool = False):
@@ -27,7 +34,13 @@ def create_trans_test_file(distance: float = 0.1, gltf: bool = False):
         f"trans_z_{distance}": translate(np.array([0, 0, distance])),
     }
 
-    write_gltf_file("trans.gltf" if gltf else "trans.glb", trans_matrices, 0.1)
+    write_gltf_file(
+        WriterInput(
+            output="trans.gltf" if gltf else "trans.glb",
+            transformation_matrices=trans_matrices,
+            size=0.1,
+        )
+    )
 
 
 def create_test_files(gltf: bool = False):
