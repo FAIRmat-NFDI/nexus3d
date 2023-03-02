@@ -1,5 +1,6 @@
 """Functions for creating a gltf cube mesh file"""
-from typing import List, Mapping, Union
+from sys import version_info
+from typing import Dict, List, Mapping, Union
 import numpy as np
 from numpy.typing import NDArray
 import pygltflib
@@ -7,7 +8,7 @@ import pygltflib
 from nexus3d.formats.cube_mesh import create_cube_arrays
 
 TransformationMatrixDict = Mapping[
-    str, Union[List[NDArray[np.float64]], NDArray[np.float64]]
+    str, Union[Dict[str, NDArray[np.float64]], NDArray[np.float64]]
 ]
 
 
@@ -119,14 +120,35 @@ def write_gltf_file(
         show_beam (bool, optional): Whether to show the beam in the gltf file. Defaults to True.
     """
 
+    def clean_name(name: str, entry_name: str):
+        def remove_prefix(text, prefix):
+            if text.startswith(prefix):
+                return text[len(prefix) :]
+            return text
+
+        if version_info.minor < 9:
+            return remove_prefix(
+                remove_prefix(remove_prefix(name, "/entry/"), entry_name),
+                "/transformatios/",
+            ).replace("/transformations", "")
+
+        return (
+            name.removeprefix("/entry/")
+            .removeprefix(entry_name)
+            .removeprefix("/transformations/")
+            .replace("/transformations", "")
+        )
+
     def append_nodes():
         for name, matrix in transformation_matrices.items():
             children = []
-            if isinstance(matrix, list):
-                for j, cmat in enumerate(matrix):
+            if isinstance(matrix, dict):
+                for j, (cname, cmat) in enumerate(matrix.items()):
                     gltf.nodes.append(
                         pygltflib.Node(
-                            mesh=0, matrix=list(cmat.T.flat), name=f"{name}.{j}"
+                            mesh=0,
+                            matrix=list(cmat.T.flat),
+                            name=f"{j}-{clean_name(cname, name)}",
                         )
                     )
                     children.append(len(gltf.nodes) - 1)

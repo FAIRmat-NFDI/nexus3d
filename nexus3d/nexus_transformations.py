@@ -2,7 +2,7 @@
 import os
 from sys import version_info
 from os import path
-from typing import Callable, Dict, List, Mapping, Union
+from typing import Callable, Dict, Mapping, Union
 import numpy as np
 from numpy.typing import NDArray
 import h5py
@@ -16,7 +16,7 @@ from nexus3d.formats.gltf_cube_mesh import write_gltf_file
 ureg = UnitRegistry()
 
 TransformationMatrixDict = Mapping[
-    str, Union[List[NDArray[np.float64]], NDArray[np.float64]]
+    str, Union[Dict[str, NDArray[np.float64]], NDArray[np.float64]]
 ]
 
 
@@ -26,9 +26,9 @@ def transformation_matrices_from(
     """Reads all NXtransformations from a nexus file
     and creates a transformation matrix from them."""
 
-    def store_in_chain(matrix: NDArray[np.float64]):
+    def store_in_chain(entry: str, matrix: NDArray[np.float64]):
         if store_intermediate:
-            matrix_chain.append(matrix)
+            matrix_chain[entry] = matrix
 
         return matrix
 
@@ -67,18 +67,19 @@ def transformation_matrices_from(
             )
 
         if attrs["depends_on"] == ".":
-            return store_in_chain(matrix)
+            return store_in_chain(entry, matrix)
 
         if "/" in attrs["depends_on"]:
             return store_in_chain(
-                get_transformation_matrix(h5file, attrs["depends_on"]) @ matrix
+                entry, get_transformation_matrix(h5file, attrs["depends_on"]) @ matrix
             )
 
         return store_in_chain(
+            entry,
             get_transformation_matrix(
                 h5file, f"{entry.rsplit('/', 1)[0]}/{attrs['depends_on']}"
             )
-            @ matrix
+            @ matrix,
         )
 
     def get_transformation_group_names(name: str, dataset: h5py.Dataset):
@@ -99,7 +100,7 @@ def transformation_matrices_from(
 
         for name, transformation_group in transformation_groups.items():
             if store_intermediate:
-                matrix_chain: List[NDArray[np.float64]] = []
+                matrix_chain: Dict[str, NDArray[np.float64]] = {}
 
             transformation_matrix = get_transformation_matrix(
                 h5file, transformation_group
