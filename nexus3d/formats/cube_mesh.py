@@ -1,5 +1,6 @@
 """Cube mesh utility functions (e.g. creating cube arrays)"""
 import numpy as np
+from stl import mesh
 
 
 def create_cube_arrays(scale: float = 1):
@@ -43,3 +44,25 @@ def create_cube_arrays(scale: float = 1):
     )
 
     return indices, vertices * scale
+
+
+def get_mesh_from_stl(filename: str):
+    """Reads a mesh as array of indices and vertices from a stl file.
+
+    Args:
+        filename (str): The stl filename
+    """
+    stl_mesh = mesh.Mesh.from_file(filename)
+
+    vertices = np.unique(
+        stl_mesh.vectors.reshape([stl_mesh.vectors.size // 3, 3]), axis=0
+    )
+
+    vertex_groups = stl_mesh.vectors.reshape([stl_mesh.vectors.size // 9, 3, 3])
+
+    indices = np.zeros((len(vertex_groups), 3), dtype="uint8")
+    for i, group in enumerate(vertex_groups):
+        for j, vertex in enumerate(group):
+            indices[i][j] = np.argwhere(np.all(vertices == vertex, axis=1))[0][0]
+
+    return indices, vertices
