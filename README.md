@@ -86,3 +86,7 @@ Rotation are applied first `x`, second `y` and last `z`.
 The full chain is therefore
 $$T  R_z  R_y  R_x  v$$
 , applied to the vector `v` in the coordinate frame of the entry.
+
+# Display in the web
+
+An example for [three.js](https://threejs.org) based rendering is available in `examples/threejs`. It is based on this [example](https://threejs.org/examples/?q=gltf#webgl_loader_gltf) from three.js. The example can be directly viewed in the github pages of this project: [https://domna.github.io/nexus3d/](https://domna.github.io/nexus3d/).
