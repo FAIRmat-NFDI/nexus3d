@@ -156,7 +156,7 @@ def apply_stl_transformations(
         NDArray[np.float64]: The transformed matrix
     """
     translations = np.zeros(3)
-    rot_matrix = translate(np.array([0, 0, 0]))
+    rot_matrix = np.identity(4)
     apply_translation = apply_rotation = False
 
     for i, axis in enumerate(["x", "y", "z"]):
@@ -168,7 +168,7 @@ def apply_stl_transformations(
         [np.array([1, 0, 0]), np.array([0, 1, 0]), np.array([0, 0, 1])],
     ):
         if rot in config_dict:
-            rot_matrix = rot_matrix @ rotate(config_dict[rot], rot_axis)
+            rot_matrix = rotate(config_dict[rot], rot_axis) @ rot_matrix
             apply_rotation = True
 
     if apply_translation:

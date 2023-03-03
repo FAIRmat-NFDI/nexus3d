@@ -5,15 +5,11 @@ from nexus3d.formats.cube_mesh import create_cube_arrays, get_mesh_from_stl
 from nexus3d.formats.interfaces import WriterInput
 from nexus3d.formats.stl_cube_mesh import write_stl_file
 
-from nexus3d.matrix import translate
-
 
 def test_cube_mesh_reconstruction(tmp_path):
     """Test whether a cube mesh is correctly reconstructed from a stl file"""
     test_file = tmp_path / "cube.stl"
-    write_stl_file(
-        WriterInput(test_file, {"test": translate(np.array([0, 0, 0]))}, 2.0, False, {})
-    )
+    write_stl_file(WriterInput(test_file, {"test": np.identity(4)}, 2.0, False, {}))
 
     indices, vertices = create_cube_arrays()
     indices_file, vertices_file = get_mesh_from_stl(test_file)
