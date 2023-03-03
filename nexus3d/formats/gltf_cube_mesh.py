@@ -1,6 +1,6 @@
 """Functions for creating a gltf cube mesh file"""
 from sys import version_info
-from typing import Dict, List, Mapping, Union
+from typing import Any, Dict, List, Mapping, Union
 import numpy as np
 from numpy.typing import NDArray
 import pygltflib
@@ -142,6 +142,44 @@ def clean_name(name: str, entry_name: str):
     )
 
 
+def apply_stl_transformations(
+    config_dict: Dict[str, Any], matrix: NDArray[np.float64]
+) -> NDArray[np.float64]:
+    """Applies stl transformations from a config dict at the end of
+    a transformation matrix.
+
+    Args:
+        config_dict (Dict[str, Any]): The config dict to read transformations from.
+        matrix (NDArray[np.float64]): The matrix to which append the transformations.
+
+    Returns:
+        NDArray[np.float64]: The transformed matrix
+    """
+    translations = np.zeros(3)
+    rot_matrix = translate(np.array([0, 0, 0]))
+    apply_translation = apply_rotation = False
+
+    for i, axis in enumerate(["x", "y", "z"]):
+        translations[i] = config_dict.get(axis, 0)
+        apply_translation = True
+
+    for rot, rot_axis in zip(
+        ["rot_x", "rot_y", "rot_z"],
+        [np.array([1, 0, 0]), np.array([0, 1, 0]), np.array([0, 0, 1])],
+    ):
+        if rot in config_dict:
+            rot_matrix = rot_matrix @ rotate(config_dict[rot], rot_axis)
+            apply_rotation = True
+
+    if apply_translation:
+        matrix = translate(translations) @ matrix
+
+    if apply_rotation:
+        matrix = rot_matrix @ matrix
+
+    return matrix
+
+
 def write_gltf_file(cli_input: WriterInput):
     """Writes a cube mesh from the transformation matrices to a gltf file.
 
@@ -156,28 +194,13 @@ def write_gltf_file(cli_input: WriterInput):
         if name not in cli_input.config_dict:
             return matrix
 
-        translations = np.zeros(3)
-        rot_matrix = translate(np.array([0, 0, 0]))
-        if name in cli_input.config_dict:
-            for i, axis in enumerate(["x", "y", "z"]):
-                translations[i] = cli_input.config_dict[name].get(axis, 0)
-
-            for rot, axis in zip(
-                ["rot_x", "rot_y", "rot_z"],
-                [np.array([1, 0, 0]), np.array([0, 1, 0]), np.array([0, 0, 1])],
-            ):
-                if rot in cli_input.config_dict[name]:
-                    rot_matrix = rot_matrix @ rotate(
-                        cli_input.config_dict[name][rot], axis
-                    )
-
         if isinstance(matrix, dict):
-            matrix["stl_shift"] = (
-                matrix[next(reversed(matrix))] @ translate(translations) @ rot_matrix
+            matrix["stl_shift"] = apply_stl_transformations(
+                cli_input.config_dict[name], matrix[next(reversed(matrix))]
             )
             return matrix
 
-        return matrix @ translate(translations) @ rot_matrix
+        return apply_stl_transformations(cli_input.config_dict[name], matrix)
 
     def append_nodes(mesh_indices: Dict[str, int]):
         for name, matrix in cli_input.transformation_matrices.items():
