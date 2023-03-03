@@ -7,7 +7,7 @@ import pygltflib
 
 from nexus3d.formats.cube_mesh import create_cube_arrays, get_mesh_from_stl
 from nexus3d.formats.interfaces import WriterInput
-from nexus3d.matrix import translate
+from nexus3d.matrix import rotate, translate
 
 TransformationMatrix = Union[Dict[str, NDArray[np.float64]], NDArray[np.float64]]
 TransformationMatrixDict = Mapping[str, TransformationMatrix]
@@ -157,17 +157,27 @@ def write_gltf_file(cli_input: WriterInput):
             return matrix
 
         translations = np.zeros(3)
+        rot_matrix = translate(np.array([0, 0, 0]))
         if name in cli_input.config_dict:
             for i, axis in enumerate(["x", "y", "z"]):
                 translations[i] = cli_input.config_dict[name].get(axis, 0)
 
+            for rot, axis in zip(
+                ["rot_x", "rot_y", "rot_z"],
+                [np.array([1, 0, 0]), np.array([0, 1, 0]), np.array([0, 0, 1])],
+            ):
+                if rot in cli_input.config_dict[name]:
+                    rot_matrix = rot_matrix @ rotate(
+                        cli_input.config_dict[name][rot], axis
+                    )
+
         if isinstance(matrix, dict):
-            matrix["stl_shift"] = matrix[next(reversed(matrix))] @ translate(
-                translations
+            matrix["stl_shift"] = (
+                matrix[next(reversed(matrix))] @ translate(translations) @ rot_matrix
             )
             return matrix
 
-        return matrix @ translate(translations)
+        return matrix @ translate(translations) @ rot_matrix
 
     def append_nodes(mesh_indices: Dict[str, int]):
         for name, matrix in cli_input.transformation_matrices.items():

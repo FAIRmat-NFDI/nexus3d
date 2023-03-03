@@ -67,7 +67,8 @@ The optional config file in json format can be used to load stl files for the di
   },
   "sample": {
     "file": "sample_holder.stl",
-    "z": 3
+    "z": 3,
+    "rot_x": 90
   },
   "instrument/detector": {
     "file": "my_detector.stl"
@@ -77,6 +78,11 @@ The optional config file in json format can be used to load stl files for the di
 
 The json keys have to be named after their respective group containing a NXtransformation without leading `/entry/`.
 The `file` attribute points to the stl file to be loaded.
-Additionally, three keys (`x`, `y`, `z`) may be provided to introduce an additional shift of the stl drawing relative to
+Additionally, three keys (`x`, `y`, `z`) for translation (in meters) and three keys (`rot_x`, `rot_y`, `rot_z`) for rotation (in degrees) may be provided to introduce an additional shift and rotation of the stl drawing relative to
 the coordinate frame from the nexus file. This is to account for any drawing offsets relative to the point denoted in the
 nexus transformations. The shifts are introduced in the coordinate frame of the entry.
+The rotations are applied first and then the object is translated.
+Rotation are applied first `x`, second `y` and last `z`.
+The full chain is therefore
+$$T  R_z  R_y  R_x  v$$
+, applied to the vector `v` in the coordinate frame of the entry.
