@@ -172,10 +172,10 @@ def apply_stl_transformations(
             apply_rotation = True
 
     if apply_translation:
-        matrix = translate(translations) @ matrix
+        matrix = matrix @ translate(translations)
 
     if apply_rotation:
-        matrix = rot_matrix @ matrix
+        matrix = matrix @ rot_matrix
 
     return matrix
 
