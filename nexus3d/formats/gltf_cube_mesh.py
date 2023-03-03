@@ -185,7 +185,7 @@ def write_gltf_file(cli_input: WriterInput):
                     )
                     children.append(len(gltf.nodes) - 1)
 
-            gltf.nodes.append(pygltflib.Node(mesh=0, name=name))
+            gltf.nodes.append(pygltflib.Node(mesh=mesh_indices[name], name=name))
 
             if children:
                 gltf.nodes[-1].children = children
@@ -251,7 +251,7 @@ def write_gltf_file(cli_input: WriterInput):
     if cli_input.show_beam:
         vertices.append(np.array([[0, 0, 0], [0, 0, -1]], dtype="float32"))
         indices.append(np.array([[0, 1]], dtype="uint8"))
-        gltf.nodes.append(pygltflib.Node(mesh=1, name="beam"))
+        gltf.nodes.append(pygltflib.Node(mesh=len(indices) - 1, name="beam"))
 
         gltf.scenes[gltf.scene].nodes.append(len(gltf.nodes) - 1)
 

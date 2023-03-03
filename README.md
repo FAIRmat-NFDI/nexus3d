@@ -46,6 +46,7 @@ Usage: nexus3d [OPTIONS] FILE
 
 Options:
   -o, --output TEXT     The filename to write to (default: experiment.glb).
+  -c, --config TEXT     Config file to load stl drawings into the final output
   -s, --size FLOAT      The side length of a cube in meters. (default: 0.1 m).
   -f, --force           Force overwriting of output file.
   --include-process     Include transformations inside /entry/process
@@ -53,3 +54,29 @@ Options:
                         Only applicable for gltf or glb files.
   --help                Show this message and exit.
 ```
+
+The optional config file in json format can be used to load stl files for the different objects, it should be according to the following format:
+
+```json
+{
+  "instrument/my_fancy_instrument": {
+    "file": "my_fancy_instrument.stl",
+    "x": 5,
+    "y": 10,
+    "z": 3
+  },
+  "sample": {
+    "file": "sample_holder.stl",
+    "z": 3
+  },
+  "instrument/detector": {
+    "file": "my_detector.stl"
+  }
+}
+```
+
+The json keys have to be named after their respective group containing a NXtransformation without leading `/entry/`.
+The `file` attribute points to the stl file to be loaded.
+Additionally, three keys (`x`, `y`, `z`) may be provided to introduce an additional shift of the stl drawing relative to
+the coordinate frame from the nexus file. This is to account for any drawing offsets relative to the point denoted in the
+nexus transformations. The shifts are introduced in the coordinate frame of the entry.
