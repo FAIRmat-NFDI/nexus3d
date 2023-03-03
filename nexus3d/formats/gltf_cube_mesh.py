@@ -48,6 +48,15 @@ def set_data(
     if len(indices_list) != len(vertices_list):
         raise ValueError("Indices list and vertices list must have the same length.")
 
+    gltf_type = {
+        "int8": pygltflib.BYTE,
+        "uint8": pygltflib.UNSIGNED_BYTE,
+        "int16": pygltflib.SHORT,
+        "uint16": pygltflib.UNSIGNED_SHORT,
+        "uint32": pygltflib.UNSIGNED_INT,
+        "float32": pygltflib.FLOAT,
+    }
+
     binary_data = b""
     offset = 0
     gltf.accesors = []
@@ -59,7 +68,7 @@ def set_data(
         gltf.accessors.append(
             pygltflib.Accessor(
                 bufferView=2 * i,
-                componentType=pygltflib.UNSIGNED_BYTE,
+                componentType=gltf_type[str(indices.dtype)],
                 count=indices.size,
                 type=pygltflib.SCALAR,
                 max=[int(indices.max())],
@@ -70,7 +79,7 @@ def set_data(
         gltf.accessors.append(
             pygltflib.Accessor(
                 bufferView=2 * i + 1,
-                componentType=pygltflib.FLOAT,
+                componentType=gltf_type[str(vertices.dtype)],
                 count=len(vertices),
                 type=pygltflib.VEC3,
                 max=vertices.max(axis=0).tolist(),

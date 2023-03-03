@@ -54,15 +54,21 @@ def get_mesh_from_stl(filename: str):
     """
     stl_mesh = mesh.Mesh.from_file(filename)
 
-    vertices = np.unique(
-        stl_mesh.vectors.reshape([stl_mesh.vectors.size // 3, 3]), axis=0
+    vertices, indices_lin = np.unique(
+        stl_mesh.vectors.reshape([stl_mesh.vectors.size // 3, 3]),
+        axis=0,
+        return_inverse=True,
     )
 
-    vertex_groups = stl_mesh.vectors.reshape([stl_mesh.vectors.size // 9, 3, 3])
+    for dtype in ["uint8", "uint16", "uint32"]:
+        if indices_lin.max() < np.iinfo(dtype).max:
+            break
 
-    indices = np.zeros((len(vertex_groups), 3), dtype="uint8")
-    for i, group in enumerate(vertex_groups):
-        for j, vertex in enumerate(group):
-            indices[i][j] = np.argwhere(np.all(vertices == vertex, axis=1))[0][0]
+        if dtype == "uint32":
+            raise ValueError(
+                f"The stl model `{filename}` is too large to be converted into gltf."
+            )
+
+    indices = indices_lin.reshape([indices_lin.size // 3, 3]).astype(dtype)
 
     return indices, vertices
