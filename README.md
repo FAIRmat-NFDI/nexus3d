@@ -89,4 +89,4 @@ $$T  R_z  R_y  R_x  v$$
 
 # Display in the web
 
-An example for [three.js](https://threejs.org) based rendering is available in `examples/threejs`. It is based on this [example](https://threejs.org/examples/?q=gltf#webgl_loader_gltf) from three.js. The example can be directly viewed in the github pages of this project: [https://domna.github.io/nexus3d/](https://domna.github.io/nexus3d/).
+An example for [three.js](https://threejs.org) based rendering is available in `examples/threejs`. It is based on this [example](https://threejs.org/examples/?q=gltf#webgl_loader_gltf) from three.js. The example can be directly viewed in the github pages of this project: [https://domna.github.io/nexus3d/](https://domna.github.io/nexus3d/). To quickly view your model there exists the excellent [gltf viewer](https://gltf-viewer.donmccurdy.com), which also allows to adjust lighting and materials of your model.
