@@ -1,3 +1,7 @@
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/nexus3d) 
+[![PyPI](https://img.shields.io/pypi/v/nexus3d)](https://pypi.org/project/nexus3d/)
+[![Pytest](https://github.com/domna/nexus3d/actions/workflows/pytest.yml/badge.svg)](https://github.com/domna/nexus3d/actions/workflows/pytest.yml)
+
 # Scope
 
 This is a project for reading out NX_TRANSFORMATION matrices from nexus files and
@@ -8,8 +12,16 @@ visualizing them by creating a 3D representation file (e.g. stl or gltf) which m
 The easiest way to install is with pip
 
 ```
+pip install nexsu3d
+```
+
+or
+
+```
 pip install git+https://github.com/domna/nexus3d.git
 ```
+
+for the latest development install.
 
 If you want to keep to source code or use a development install clone the repostitory
 
