@@ -1,19 +1,22 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=64.0.1", "setuptools-scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "nexus3d"
-version = "0.0.1"
+dynamic = ["version"]
 authors = [
-    { name = "Florian Dobener" },
+    { name = "Florian Dobener", email = "florian.dobener@physik.hu-berlin.de" },
 ]
 description = "Convert NXtransformation matrices inside a nexus file to 3D file formats"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.8"
 classifiers = [
-    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
@@ -38,3 +41,7 @@ dev = [
 
 [project.scripts]
 nexus3d = "nexus3d.nexus_transformations:cli"
+
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+local_scheme = "node-and-date"
