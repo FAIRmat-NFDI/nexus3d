@@ -8,15 +8,13 @@ from typing import Callable, Dict, Mapping, Union
 import numpy as np
 from numpy.typing import NDArray
 import h5py
-from pint import UnitRegistry
 import click
 from nexus3d.formats.interfaces import WriterInput
 
 from nexus3d.matrix import rotate, translate
 from nexus3d.formats.stl_cube_mesh import write_stl_file
 from nexus3d.formats.gltf_cube_mesh import write_gltf_file
-
-ureg = UnitRegistry()
+from nexus3d.units import ureg
 
 TransformationMatrixDict = Mapping[
     str, Union[Dict[str, NDArray[np.float64]], NDArray[np.float64]]

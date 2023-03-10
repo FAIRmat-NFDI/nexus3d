@@ -168,7 +168,7 @@ def apply_stl_transformations(
         [np.array([1, 0, 0]), np.array([0, 1, 0]), np.array([0, 0, 1])],
     ):
         if rot in config_dict:
-            rot_matrix = rotate(config_dict[rot], rot_axis) @ rot_matrix
+            rot_matrix = rotate(np.deg2rad(config_dict[rot]), rot_axis) @ rot_matrix
             apply_rotation = True
 
     if apply_translation:
@@ -248,7 +248,8 @@ def write_gltf_file(cli_input: WriterInput):
         for name in cli_input.transformation_matrices:
             if name in cli_input.config_dict and "file" in cli_input.config_dict[name]:
                 stl_indices, stl_vertices = get_mesh_from_stl(
-                    cli_input.config_dict[name]["file"]
+                    cli_input.config_dict[name]["file"],
+                    cli_input.config_dict[name].get("unit"),
                 )
 
                 indices.append(stl_indices)

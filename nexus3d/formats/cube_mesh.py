@@ -1,6 +1,9 @@
 """Cube mesh utility functions (e.g. creating cube arrays)"""
+from typing import Optional
 import numpy as np
 from stl import mesh
+
+from nexus3d.units import ureg
 
 
 def create_cube_arrays(scale: float = 1):
@@ -46,11 +49,12 @@ def create_cube_arrays(scale: float = 1):
     return indices, vertices * scale
 
 
-def get_mesh_from_stl(filename: str):
+def get_mesh_from_stl(filename: str, unit: Optional[str] = None):
     """Reads a mesh as array of indices and vertices from a stl file.
 
     Args:
         filename (str): The stl filename
+        unit (str): A pint interpretable unit which to interpret from the stl file.
     """
     stl_mesh = mesh.Mesh.from_file(filename)
 
@@ -71,4 +75,7 @@ def get_mesh_from_stl(filename: str):
 
     indices = indices_lin.reshape([indices_lin.size // 3, 3]).astype(dtype)
 
-    return indices, vertices
+    if unit is not None:
+        scaling = ureg(f"1 {unit}").to("m").magnitude
+        return indices, vertices * scaling
+    return indices, vertices * scaling
