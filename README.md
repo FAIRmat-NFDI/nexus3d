@@ -1,4 +1,4 @@
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/nexus3d) 
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/nexus3d)
 [![PyPI](https://img.shields.io/pypi/v/nexus3d)](https://pypi.org/project/nexus3d/)
 [![Pytest](https://github.com/domna/nexus3d/actions/workflows/pytest.yml/badge.svg)](https://github.com/domna/nexus3d/actions/workflows/pytest.yml)
 
@@ -80,10 +80,12 @@ The optional config file in json format can be used to load stl files for the di
   "sample": {
     "file": "sample_holder.stl",
     "z": 3,
-    "rot_x": 90
+    "rot_x": 90,
+    "unit": "mm"
   },
   "instrument/detector": {
-    "file": "my_detector.stl"
+    "file": "my_detector.stl",
+    "unit": "inch"
   }
 }
 ```
@@ -98,6 +100,9 @@ Rotation are applied first `x`, second `y` and last `z`.
 The full chain is therefore
 $$T  R_z  R_y  R_x  v$$
 , applied to the vector `v` in the coordinate frame of the entry.
+To account for different units in the stl files a unit field may be provided.
+The unit needs to be [pint](https://pint.readthedocs.io) convertible to meter.
+If the unit field is not given meter is taken as default unit.
 
 # Display in the web
 
