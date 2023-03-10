@@ -76,6 +76,6 @@ def get_mesh_from_stl(filename: str, unit: Optional[str] = None):
     indices = indices_lin.reshape([indices_lin.size // 3, 3]).astype(dtype)
 
     if unit is not None:
-        scaling = ureg(f"1 {unit}").to("m").magnitude
+        scaling = ureg(f"1 {unit}").to("m").magnitude  # type: ignore
         return indices, vertices * scaling
-    return indices, vertices * scaling
+    return indices, vertices
