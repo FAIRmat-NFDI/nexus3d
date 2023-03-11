@@ -12,7 +12,7 @@ visualizing them by creating a 3D representation file (e.g. stl or gltf) which m
 The easiest way to install is with pip
 
 ```
-pip install nexsu3d
+pip install nexus3d
 ```
 
 or
