@@ -29,6 +29,12 @@ dependencies = [
     "pygltflib",
 ]
 
+[project.urls]
+homepage = "https://github.com/domna/nexus3d"
+repository = "https://github.com/domna/nexus3d"
+tracker = "https://github.com/domna/nexus3d/issues"
+download = "https://github.com/domna/nexus3d/releases"
+
 [project.optional-dependencies]
 dev = [
     "mypy",

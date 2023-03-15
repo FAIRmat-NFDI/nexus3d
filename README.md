@@ -5,7 +5,7 @@
 # Scope
 
 This is a project for reading out NX_TRANSFORMATION matrices from nexus files and
-visualizing them by creating a 3D representation file (e.g. stl or gltf) which may be imported into 3D visualization software.
+visualizing them by creating a 3D representation file ([stl](<https://en.wikipedia.org/wiki/STL_(file_format)>) or [gltf/glb](https://en.wikipedia.org/wiki/GlTF) - we recommend using `glb`) which may be imported into 3D visualization software (e.g. blender). It is possible to load CAD drawings from stl files to visualize your experiment with it. For glb files you can easily visualize it in the web with three.js (see the [example](https://github.com/domna/nexus3d/tree/main/examples/threejs))
 
 # Install
 
@@ -106,4 +106,4 @@ If the unit field is not given meter is taken as default unit.
 
 # Display in the web
 
-An example for [three.js](https://threejs.org) based rendering is available in `examples/threejs`. It is based on this [example](https://threejs.org/examples/?q=gltf#webgl_loader_gltf) from three.js. The example can be directly viewed in the github pages of this project: [https://domna.github.io/nexus3d/](https://domna.github.io/nexus3d/). To quickly view your model there exists the excellent [gltf viewer](https://gltf-viewer.donmccurdy.com), which also allows to adjust lighting and materials of your model.
+An example for [three.js](https://threejs.org) based rendering is available in [`examples/threejs`](https://github.com/domna/nexus3d/tree/main/examples/threejs). It is based on this [example](https://threejs.org/examples/?q=gltf#webgl_loader_gltf) from three.js. The example can be directly viewed in the github pages of this project: [https://domna.github.io/nexus3d/](https://domna.github.io/nexus3d/). To quickly view your model there exists the excellent [gltf viewer](https://gltf-viewer.donmccurdy.com), which also allows to adjust lighting and materials of your model.
