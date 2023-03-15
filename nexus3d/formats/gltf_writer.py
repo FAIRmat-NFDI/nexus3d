@@ -5,7 +5,7 @@ import numpy as np
 from numpy.typing import NDArray
 import pygltflib
 
-from nexus3d.formats.cube_mesh import create_cube_arrays, get_mesh_from_stl
+from nexus3d.formats.mesh import create_cube_arrays, get_mesh_from_stl
 from nexus3d.formats.interfaces import WriterInput
 from nexus3d.matrix import rotate, translate
 

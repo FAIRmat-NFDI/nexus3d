@@ -4,7 +4,7 @@ import numpy as np
 from numpy.typing import NDArray
 from stl import mesh
 
-from nexus3d.formats.cube_mesh import create_cube_arrays
+from nexus3d.formats.mesh import create_cube_arrays
 from nexus3d.formats.interfaces import WriterInput
 
 TransformationMatrixDict = Mapping[

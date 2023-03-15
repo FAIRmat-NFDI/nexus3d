@@ -1,6 +1,6 @@
 """Creates test files for rotation and translation for reference."""
 import numpy as np
-from nexus3d.formats.gltf_cube_mesh import write_gltf_file
+from nexus3d.formats.gltf_writer import write_gltf_file
 from nexus3d.formats.interfaces import WriterInput
 from nexus3d.matrix import rotate, translate
 

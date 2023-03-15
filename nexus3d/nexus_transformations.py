@@ -12,8 +12,8 @@ import click
 from nexus3d.formats.interfaces import WriterInput
 
 from nexus3d.matrix import rotate, translate
-from nexus3d.formats.stl_cube_mesh import write_stl_file
-from nexus3d.formats.gltf_cube_mesh import write_gltf_file
+from nexus3d.formats.stl_writer import write_stl_file
+from nexus3d.formats.gltf_writer import write_gltf_file
 from nexus3d.units import ureg
 
 TransformationMatrixDict = Mapping[
