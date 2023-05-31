@@ -54,8 +54,11 @@ def transformation_matrices_from(
         # Always use the first element and ignore the dimension
         # With gltf we probably could also animate it!
         field = h5file[entry][()].flat[0]
-        if not isinstance(field, (int, float)):
-            raise NotImplementedError("Only float fields are supported yet.")
+        if not isinstance(field, (int, float, np.int64, np.float64)):
+            raise NotImplementedError(
+                "Only float fields are supported yet, "
+                f"but {entry}: {field} is {type(field)}"
+            )
         field_si = ureg(f"{field} {attrs['units']}").to_base_units().magnitude  # type: ignore
 
         if attrs["transformation_type"] == "translation":
