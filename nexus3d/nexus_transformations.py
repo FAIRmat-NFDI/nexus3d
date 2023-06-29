@@ -163,6 +163,12 @@ def transformation_matrices_from(
         "Only applicable for gltf or glb files."
     ),
 )
+@click.option(
+    "--shape",
+    default="cone",
+    type=str,
+    help="The shape to write into the gltf file. Only applicable for gltf or glb files.",
+)
 def cli(  # pylint: disable=too-many-arguments
     file: str,
     config: str,
@@ -171,6 +177,7 @@ def cli(  # pylint: disable=too-many-arguments
     size: float,
     include_process: bool,
     store_intermediate: bool,
+    shape: str,
 ):
     """
     Create a glb/gltf or stl from a nexus file via the command line.
@@ -236,5 +243,6 @@ def cli(  # pylint: disable=too-many-arguments
             size=size,
             show_beam=True,
             config_dict=config_dict,
+            shape=shape,
         )
     )

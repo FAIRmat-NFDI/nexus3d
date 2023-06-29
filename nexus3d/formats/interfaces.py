@@ -18,3 +18,4 @@ class WriterInput:
     size: float
     show_beam: bool = False
     config_dict: Optional[Dict[str, Dict[str, str]]] = None
+    shape: str = "cone"

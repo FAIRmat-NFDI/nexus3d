@@ -7,10 +7,10 @@ from nexus3d.units import ureg
 
 
 def create_cube_arrays(scale: float = 1):
-    """Get cube arrays for creating the cubes.
+    """Get vertices and indices arrays for creating a cube.
 
     Args:
-        scale (float, optional): The scale of the cubes. Defaults to 1.
+        scale (float, optional): The scale of the cube. Defaults to 1.
 
     Returns:
         (np.ndarray, np.ndarray): The points and triangles array of the cube.
@@ -47,6 +47,52 @@ def create_cube_arrays(scale: float = 1):
     )
 
     return indices, vertices * scale
+
+
+def create_cone_arrays(scale: float = 1):
+    """Get vertices and index arrays for creating a cone.
+
+    Args:
+        scale (float, optional): The scale of the cone. Defaults to 1.
+
+    Returns:
+        (np.ndarray, np.ndarray): The points and triangles array of the cone.
+    """
+    aspect_ratio = 2
+    vertices = np.array(
+        [
+            [0, 0, 0],
+            [1.3, 0, -aspect_ratio],
+            [0.809017, 0.587785, -aspect_ratio],
+            [0.309017, 0.951057, -aspect_ratio],
+            [-0.309017, 0.951057, -aspect_ratio],
+            [-0.809017, 0.587785, -aspect_ratio],
+            [-1.3, 0, -aspect_ratio],
+            [-0.809017, -0.587785, -aspect_ratio],
+            [-0.309017, -0.951057, -aspect_ratio],
+            [0.309017, -0.951057, -aspect_ratio],
+            [0.809017, -0.587785, -aspect_ratio],
+        ],
+        dtype="float32",
+    )
+
+    indices = np.array(
+        [
+            [0, 1, 2],
+            [0, 2, 3],
+            [0, 3, 4],
+            [0, 4, 5],
+            [0, 5, 6],
+            [0, 6, 7],
+            [0, 7, 8],
+            [0, 8, 9],
+            [0, 9, 10],
+            [0, 10, 1],
+        ],
+        dtype="uint8",
+    )
+
+    return indices, vertices * scale / aspect_ratio
 
 
 def get_mesh_from_stl(filename: str, unit: Optional[str] = None):

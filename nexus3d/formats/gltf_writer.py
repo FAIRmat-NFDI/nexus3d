@@ -1,16 +1,23 @@
 """Functions for creating a gltf cube mesh file"""
 from sys import version_info
+import logging
 from typing import Any, Dict, List, Mapping, Union
 import numpy as np
 from numpy.typing import NDArray
 import pygltflib
 
-from nexus3d.formats.mesh import create_cube_arrays, get_mesh_from_stl
+from nexus3d.formats.mesh import (
+    create_cube_arrays,
+    create_cone_arrays,
+    get_mesh_from_stl,
+)
 from nexus3d.formats.interfaces import WriterInput
 from nexus3d.matrix import rotate, translate
 
 TransformationMatrix = Union[Dict[str, NDArray[np.float64]], NDArray[np.float64]]
 TransformationMatrixDict = Mapping[str, TransformationMatrix]
+
+logger = logging.getLogger(__name__)
 
 
 def get_binary_blobs(indices: NDArray[np.uint8], vertices: NDArray[np.float32]):
@@ -243,8 +250,9 @@ def write_gltf_file(cli_input: WriterInput):
         )
 
     def create_meshs():
+        shapes = {"cube": create_cube_arrays, "cone": create_cone_arrays}
         mesh_indices = {}
-        cube_index = None
+        shape_index = None
         for name in cli_input.transformation_matrices:
             if name in cli_input.config_dict and "file" in cli_input.config_dict[name]:
                 stl_indices, stl_vertices = get_mesh_from_stl(
@@ -258,13 +266,19 @@ def write_gltf_file(cli_input: WriterInput):
                 append_mesh()
                 continue
 
-            if cube_index is None:
-                cube_indices, cube_vertices = create_cube_arrays(cli_input.size / 2)
-                indices.append(cube_indices)
-                vertices.append(cube_vertices)
-                cube_index = len(vertices) - 1
+            if shape_index is None:
+                if cli_input.shape not in shapes:
+                    logger.warning(
+                        "Shape `%s` not valid. Using cones as default.", cli_input.shape
+                    )
+                shape_indices, shape_vertices = shapes.get(
+                    cli_input.shape, create_cone_arrays
+                )(cli_input.size / 2)
+                indices.append(shape_indices)
+                vertices.append(shape_vertices)
+                shape_index = len(vertices) - 1
                 append_mesh()
-            mesh_indices[name] = cube_index
+            mesh_indices[name] = shape_index
 
         return mesh_indices
 
