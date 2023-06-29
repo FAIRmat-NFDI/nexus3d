@@ -59,21 +59,24 @@ def create_cone_arrays(scale: float = 1):
         (np.ndarray, np.ndarray): The points and triangles array of the cone.
     """
     aspect_ratio = 2
-    vertices = np.array(
-        [
-            [0, 0, 0],
-            [1.3, 0, -aspect_ratio],
-            [0.809017, 0.587785, -aspect_ratio],
-            [0.309017, 0.951057, -aspect_ratio],
-            [-0.309017, 0.951057, -aspect_ratio],
-            [-0.809017, 0.587785, -aspect_ratio],
-            [-1.3, 0, -aspect_ratio],
-            [-0.809017, -0.587785, -aspect_ratio],
-            [-0.309017, -0.951057, -aspect_ratio],
-            [0.309017, -0.951057, -aspect_ratio],
-            [0.809017, -0.587785, -aspect_ratio],
-        ],
-        dtype="float32",
+    vertices = (
+        np.array(
+            [
+                [0, 0, 0],
+                [-1.3, 0, aspect_ratio],
+                [-0.809017, -0.587785, aspect_ratio],
+                [-0.309017, -0.951057, aspect_ratio],
+                [0.309017, -0.951057, aspect_ratio],
+                [0.809017, -0.587785, aspect_ratio],
+                [1.3, 0, aspect_ratio],
+                [0.809017, 0.587785, aspect_ratio],
+                [0.309017, 0.951057, aspect_ratio],
+                [-0.309017, 0.951057, aspect_ratio],
+                [-0.809017, 0.587785, aspect_ratio],
+            ],
+            dtype="float32",
+        )
+        / aspect_ratio
     )
 
     indices = np.array(
@@ -92,7 +95,7 @@ def create_cone_arrays(scale: float = 1):
         dtype="uint8",
     )
 
-    return indices, vertices * scale / aspect_ratio
+    return indices, vertices * scale
 
 
 def get_mesh_from_stl(filename: str, unit: Optional[str] = None):
