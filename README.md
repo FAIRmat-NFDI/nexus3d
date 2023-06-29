@@ -4,8 +4,8 @@
 
 # Scope
 
-This is a project for reading out NX_TRANSFORMATION matrices from nexus files and
-visualizing them by creating a 3D representation file ([stl](<https://en.wikipedia.org/wiki/STL_(file_format)>) or [gltf/glb](https://en.wikipedia.org/wiki/GlTF) - we recommend using `glb`) which may be imported into 3D visualization software (e.g. blender). It is possible to load CAD drawings from stl files to visualize your experiment with it. For glb files you can easily visualize it in the web with three.js (see the [example](https://github.com/domna/nexus3d/tree/main/examples/threejs))
+This is a project for reading out NX*TRANSFORMATION matrices from nexus files and
+visualizing them by creating a 3D representation file ([stl](<https://en.wikipedia.org/wiki/STL*(file_format)>) or [gltf/glb](https://en.wikipedia.org/wiki/GlTF) - we recommend using `glb`) which may be imported into 3D visualization software (e.g. blender). It is possible to load CAD drawings from stl files to visualize your experiment with it. For glb files you can easily visualize it in the web with three.js (see the [example](https://github.com/domna/nexus3d/tree/main/examples/threejs))
 
 # Install
 
@@ -57,13 +57,15 @@ Usage: nexus3d [OPTIONS] FILE
   experiment.glb).
 
 Options:
-  -o, --output TEXT     The filename to write to (default: experiment.glb).
+  -o, --output TEXT     The filename to write to.  [default: experiment.glb]
   -c, --config TEXT     Config file to load stl drawings into the final output
-  -s, --size FLOAT      The side length of a cube in meters. (default: 0.1 m).
+  -s, --size FLOAT      The side length of a cube in meters.  [default: 0.1]
   -f, --force           Force overwriting of output file.
   --include-process     Include transformations inside /entry/process
   --store-intermediate  Store the intermediate matrices in gltf child nodes.
                         Only applicable for gltf or glb files.
+  --shape [cone|cube]   The shape to write into the gltf file. Only applicable
+                        for gltf or glb files.   [default: cone]
   --help                Show this message and exit.
 ```
 

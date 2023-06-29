@@ -123,7 +123,8 @@ def transformation_matrices_from(
     "-o",
     "--output",
     default="experiment.glb",
-    help="The filename to write to (default: experiment.glb).",
+    help="The filename to write to.",
+    show_default=True,
 )
 @click.option(
     "-c",
@@ -136,7 +137,8 @@ def transformation_matrices_from(
     "--size",
     default=0.1,
     type=float,
-    help="The side length of a cube in meters. (default: 0.1 m).",
+    help="The side length of a cube in meters.",
+    show_default=True,
 )
 @click.option(
     "-f",
@@ -166,8 +168,11 @@ def transformation_matrices_from(
 @click.option(
     "--shape",
     default="cone",
-    type=str,
-    help="The shape to write into the gltf file. Only applicable for gltf or glb files.",
+    type=click.Choice(["cone", "cube"]),
+    help=(
+        "The shape to write into the gltf file. Only applicable for gltf or glb files. "
+    ),
+    show_default=True,
 )
 def cli(  # pylint: disable=too-many-arguments
     file: str,
