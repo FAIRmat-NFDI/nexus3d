@@ -50,6 +50,33 @@ def rotate(
     return rot_matrix
 
 
+def rotate_z_onto_vec(
+    vec: NDArray[np.float64], offset: Optional[NDArray[np.float64]] = None
+) -> NDArray[np.float64]:
+    """Generates a 4D rotation matrix to transform the z-axis
+    from the reference frame onto the provided vector.
+
+    Args:
+        vec (NDArray[np.float64]): The vector to rotate onto.
+        offset (Optional[NDArray[np.float64]], optional):
+            An additional offset. Setting this to None ignores the offset. Defaults to None.
+
+    Returns:
+        np.ndarray[(4, 4), float]: The 4D rotation matrix
+    """
+    if offset is None:
+        offset = np.zeros(3)
+
+    return np.array(
+        [
+            [0, 0, vec[0], offset[0]],
+            [0, 0, vec[1], offset[1]],
+            [0, 0, vec[2], offset[2]],
+            [0, 0, 0, 1],
+        ]
+    )
+
+
 def translate(
     translation: NDArray[np.float64], offset: Optional[NDArray[np.float64]] = None
 ) -> NDArray[np.float64]:
