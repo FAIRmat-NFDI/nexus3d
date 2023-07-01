@@ -4,8 +4,8 @@
 
 # Scope
 
-This is a project for reading out NX*TRANSFORMATION matrices from nexus files and
-visualizing them by creating a 3D representation file ([stl](<https://en.wikipedia.org/wiki/STL*(file_format)>) or [gltf/glb](https://en.wikipedia.org/wiki/GlTF) - we recommend using `glb`) which may be imported into 3D visualization software (e.g. blender). It is possible to load CAD drawings from stl files to visualize your experiment with it. For glb files you can easily visualize it in the web with three.js (see the [example](https://github.com/domna/nexus3d/tree/main/examples/threejs))
+This is a project for reading out NXtransformation matrices from nexus files and
+visualizing them by creating a 3D representation file ([stl](<https://en.wikipedia.org/wiki/STL_(file_format)>) or [gltf/glb](https://en.wikipedia.org/wiki/GlTF) - we recommend using `glb`) which may be imported into 3D visualization software (e.g. blender). It is possible to load CAD drawings from stl files to visualize your experiment with it. For glb files you can easily visualize it in the web with three.js (see the [example](https://github.com/domna/nexus3d/tree/main/examples/threejs))
 
 # Install
 
