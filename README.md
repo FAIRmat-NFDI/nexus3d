@@ -106,6 +106,20 @@ To account for different units in the stl files a unit field may be provided.
 The unit needs to be [pint](https://pint.readthedocs.io) convertible to meter.
 If the unit field is not given meter is taken as default unit.
 
+# Using with blender
+
+The exported glb or gltf files can be directly used with blender to have a proper visualization available.
+However, please note that blender does a coordinate transform from glb/gltf files.
+The mapping is:
+
+| Blender  | gltf/glb |
+| :------: | :------: |
+| x        | x        |
+| y        | -z       |
+| z        | y        |
+
+This is equivalent to a rotation around the x-axis by 90 degrees.
+
 # Display in the web
 
 An example for [three.js](https://threejs.org) based rendering is available in [`examples/threejs`](https://github.com/domna/nexus3d/tree/main/examples/threejs). It is based on this [example](https://threejs.org/examples/?q=gltf#webgl_loader_gltf) from three.js. The example can be directly viewed in the github pages of this project: [https://domna.github.io/nexus3d/](https://domna.github.io/nexus3d/). To quickly view your model there exists the excellent [gltf viewer](https://gltf-viewer.donmccurdy.com), which also allows to adjust lighting and materials of your model.
