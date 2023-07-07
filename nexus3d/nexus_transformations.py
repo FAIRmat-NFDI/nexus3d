@@ -125,9 +125,9 @@ def apply_blender_transform(
 
     for key, val in transformations.items():
         if isinstance(val, dict):
-            transformations[key] = apply_blender_transform(val)
-            continue
-        transformations[key] = blender_rot @ val
+            transformations[key] = apply_blender_transform(val)  # type: ignore
+        else:
+            transformations[key] = blender_rot @ val  # type: ignore
 
     return transformations
 
