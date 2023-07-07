@@ -297,7 +297,12 @@ def write_gltf_file(cli_input: WriterInput):
     append_nodes(mesh_indices)
 
     if cli_input.show_beam:
-        vertices.append(np.array([[0, 0, 0], [0, 0, -1]], dtype="float32"))
+        vertices.append(
+            np.array(
+                [[0, 0, 0], [0, -1, 0] if cli_input.beam_blender else [0, 0, -1]],
+                dtype="float32",
+            )
+        )
         indices.append(np.array([[0, 1]], dtype="uint8"))
         gltf.nodes.append(pygltflib.Node(mesh=len(indices) - 1, name="beam"))
 

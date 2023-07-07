@@ -17,5 +17,6 @@ class WriterInput:
     transformation_matrices: TransformationMatrixDict
     size: float
     show_beam: bool = False
+    beam_blender: bool = False
     config_dict: Optional[Dict[str, Dict[str, str]]] = None
     shape: str = "cone"

@@ -66,6 +66,8 @@ Options:
                         Only applicable for gltf or glb files.
   --shape [cone|cube]   The shape to write into the gltf file. Only applicable
                         for gltf or glb files.   [default: cone]
+  --blender             Rotates the coordinate system by 90 degree around the
+                        x-axis. This maps the axes correctly to blender.
   --help                Show this message and exit.
 ```
 
@@ -112,13 +114,15 @@ The exported glb or gltf files can be directly used with blender to have a prope
 However, please note that blender does a coordinate transform from glb/gltf files.
 The mapping is:
 
-| Blender  | gltf/glb |
-| :------: | :------: |
-| x        | x        |
-| y        | -z       |
-| z        | y        |
+| Blender | gltf/glb |
+| :-----: | :------: |
+|    x    |    x     |
+|    y    |    -z    |
+|    z    |    y     |
 
 This is equivalent to a rotation around the x-axis by 90 degrees.
+There is also the `--blender` flag which may be used to transform the coordinate system to be displayed correctly in blender.
+However, in this case the coordinate system would be changed inside the gltf/glb file.
 
 # Display in the web
 

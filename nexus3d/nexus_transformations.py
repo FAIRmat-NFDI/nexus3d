@@ -117,6 +117,21 @@ def transformation_matrices_from(
     return transformation_matrices
 
 
+def apply_blender_transform(
+    transformations: TransformationMatrixDict,
+) -> TransformationMatrixDict:
+    """Applyes a transformation to align the CS in blender."""
+    blender_rot = rotate(np.deg2rad(-90), np.array([1, 0, 0]))
+
+    for key, val in transformations.items():
+        if isinstance(val, dict):
+            transformations[key] = apply_blender_transform(val)
+            continue
+        transformations[key] = blender_rot @ val
+
+    return transformations
+
+
 @click.command()
 @click.argument("file")
 @click.option(
@@ -174,6 +189,16 @@ def transformation_matrices_from(
     ),
     show_default=True,
 )
+@click.option(
+    "--blender",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help=(
+        "Rotates the coordinate system by 90 degree around the x-axis. "
+        "This maps the axes correctly to blender."
+    ),
+)
 def cli(  # pylint: disable=too-many-arguments
     file: str,
     config: str,
@@ -182,6 +207,7 @@ def cli(  # pylint: disable=too-many-arguments
     size: float,
     include_process: bool,
     store_intermediate: bool,
+    blender: bool,
     shape: str,
 ):
     """
@@ -239,14 +265,19 @@ def cli(  # pylint: disable=too-many-arguments
         ".glb": write_gltf_file,
     }
 
+    transformation_matrices = transformation_matrices_from(
+        file, include_process, store_intermediate
+    )
+    if blender:
+        transformation_matrices = apply_blender_transform(transformation_matrices)
+
     format_map.get(file_format, format_not_implemented)(
         WriterInput(
             output=output,
-            transformation_matrices=transformation_matrices_from(
-                file, include_process, store_intermediate
-            ),
+            transformation_matrices=transformation_matrices,
             size=size,
             show_beam=True,
+            beam_blender=blender,
             config_dict=config_dict,
             shape=shape,
         )
