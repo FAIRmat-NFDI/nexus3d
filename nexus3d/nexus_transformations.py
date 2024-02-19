@@ -9,6 +9,7 @@ from typing import Callable, Dict, Mapping, Union
 import click
 import h5py
 import numpy as np
+import xarray as xr
 from numpy.typing import NDArray
 
 from nexus3d.formats.gltf_writer import write_gltf_file
@@ -21,14 +22,18 @@ TransformationMatrixDict = Mapping[
     str, Union[Dict[str, NDArray[np.float64]], NDArray[np.float64]]
 ]
 
+TransformationMatrixXarray = Mapping[str, Union[Dict[str, xr.DataArray], xr.DataArray]]
 
-def transformation_matrices_from(
+
+def transformation_matrices_xarray(
     fname: str, include_process: bool, store_intermediate: bool = False
-) -> TransformationMatrixDict:
-    """Reads all NXtransformations from a nexus file
-    and creates a transformation matrix from them."""
+) -> TransformationMatrixXarray:
+    """
+    Reads all NXtransformations from a nexus file
+    and creates a transformation matrix from them.
+    """
 
-    def store_in_chain(entry: str, matrix: NDArray[np.float64]):
+    def store_in_chain(entry: str, matrix: xr.DataArray):
         if store_intermediate:
             matrix_chain[entry] = matrix
 
@@ -52,39 +57,64 @@ def transformation_matrices_from(
 
         vector = attrs["vector"]
 
-        # Always use the first element and ignore the dimension
-        # With gltf we probably could also animate it!
-        field = h5file[entry][()].flat[0]
-        if not isinstance(field, (int, float, np.int64, np.float64)):
+        field = h5file[entry][()]
+        if isinstance(field, np.ndarray) and field.ndim == 1:
+            matrices = xr.DataArray(
+                np.zeros((len(field), 4, 4)),
+                dims=[entry, "m1", "m2"],
+                coords={entry: field},
+            )
+        elif isinstance(field, (int, float, np.int64, np.float64)):
+            matrices = xr.DataArray(
+                np.zeros((1, 4, 4)), dims=[entry, "m1", "m2"], coords={entry: [field]}
+            )
+        else:
             raise NotImplementedError(
-                "Only float fields are supported yet, "
+                "Only 0D and 1D numeric fields are supported yet, "
                 f"but {entry}: {field} is {type(field)}"
             )
-        field_si = ureg(f"{field} {attrs['units']}").to_base_units().magnitude  # type: ignore
 
-        if attrs["transformation_type"] == "translation":
-            matrix = translate(field_si * vector, offset_si)
-        elif attrs["transformation_type"] == "rotation":
-            matrix = rotate(field_si, vector, offset_si)
-        else:
-            raise ValueError(
-                f"Unknown transformation type `{attrs['transformation_type']}`"
-            )
+        for i, point in enumerate(matrices):
+            field = point[entry].values[0]
+            field_si = ureg(f"{field} {attrs['units']}").to_base_units().magnitude  # type: ignore
+
+            if attrs["transformation_type"] == "translation":
+                matrices[i] = translate(field_si * vector, offset_si)
+            elif attrs["transformation_type"] == "rotation":
+                matrices[i] = rotate(field_si, vector, offset_si)
+            else:
+                raise ValueError(
+                    f"Unknown transformation type `{attrs['transformation_type']}`"
+                )
 
         if attrs["depends_on"] == ".":
-            return store_in_chain(entry, matrix)
+            return store_in_chain(entry, matrices)
 
         if "/" in attrs["depends_on"]:
             return store_in_chain(
-                entry, get_transformation_matrix(h5file, attrs["depends_on"]) @ matrix
+                entry,
+                xr.apply_ufunc(
+                    np.matmul,
+                    get_transformation_matrix(h5file, attrs["depends_on"]),
+                    matrices,
+                    input_core_dims=[["m1", "m2"], ["m1", "m2"]],
+                    output_core_dims=[["m1", "m2"]],
+                    vectorize=True,
+                ),
             )
 
         return store_in_chain(
             entry,
-            get_transformation_matrix(
-                h5file, f"{entry.rsplit('/', 1)[0]}/{attrs['depends_on']}"
-            )
-            @ matrix,
+            xr.apply_ufunc(
+                np.matmul,
+                get_transformation_matrix(
+                    h5file, f"{entry.rsplit('/', 1)[0]}/{attrs['depends_on']}"
+                ),
+                matrices,
+                input_core_dims=[["m1", "m2"], ["m1", "m2"]],
+                output_core_dims=[["m1", "m2"]],
+                vectorize=True,
+            ),
         )
 
     def get_transformation_group_names(name: str, dataset: h5py.Dataset):
@@ -105,7 +135,7 @@ def transformation_matrices_from(
 
         for name, transformation_group in transformation_groups.items():
             if store_intermediate:
-                matrix_chain: Dict[str, NDArray[np.float64]] = OrderedDict()
+                matrix_chain: Dict[str, xr.DataArray] = OrderedDict()
 
             transformation_matrix = get_transformation_matrix(
                 h5file, transformation_group
@@ -116,6 +146,22 @@ def transformation_matrices_from(
             )
 
     return transformation_matrices
+
+
+def transformation_matrices_from(
+    fname: str, include_process: bool, store_intermediate: bool = False
+) -> TransformationMatrixDict:
+    tmatrices = transformation_matrices_xarray(
+        fname, include_process, store_intermediate
+    )
+
+    transformation_matrices_flat = {}
+    for matrix in tmatrices:
+        transformation_matrices_flat[matrix] = (
+            tmatrices[matrix].values.flat[:16].reshape(4, 4)
+        )
+
+    return transformation_matrices_flat
 
 
 def apply_blender_transform(
