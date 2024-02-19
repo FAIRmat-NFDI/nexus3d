@@ -28,6 +28,7 @@ dependencies = [
     "numpy-stl",
     "click",
     "pygltflib",
+    "xarray",
 ]
 
 [project.urls]
