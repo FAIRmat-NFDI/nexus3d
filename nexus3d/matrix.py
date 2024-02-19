@@ -1,5 +1,6 @@
 """Transformation matrices for nexus"""
 from typing import Optional
+
 import numpy as np
 from numpy.linalg import norm
 from numpy.typing import NDArray

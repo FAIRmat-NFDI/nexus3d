@@ -1,19 +1,20 @@
 """Create a stl from NXtransformation groups"""
-from collections import OrderedDict
 import json
 import os
-from sys import version_info
+from collections import OrderedDict
 from os import path
+from sys import version_info
 from typing import Callable, Dict, Mapping, Union
+
+import click
+import h5py
 import numpy as np
 from numpy.typing import NDArray
-import h5py
-import click
-from nexus3d.formats.interfaces import WriterInput
 
-from nexus3d.matrix import rotate, translate
-from nexus3d.formats.stl_writer import write_stl_file
 from nexus3d.formats.gltf_writer import write_gltf_file
+from nexus3d.formats.interfaces import WriterInput
+from nexus3d.formats.stl_writer import write_stl_file
+from nexus3d.matrix import rotate, translate
 from nexus3d.units import ureg
 
 TransformationMatrixDict = Mapping[

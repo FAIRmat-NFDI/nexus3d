@@ -1,11 +1,12 @@
 """Test correct reading and reduction of transformations"""
 import os
+
 import numpy as np
-from numpy.testing import assert_array_almost_equal, assert_almost_equal
+from numpy.testing import assert_almost_equal, assert_array_almost_equal
 from pytest import fixture
 from scipy.spatial.transform import Rotation
-from nexus3d.coordinate_systems import angle_between
 
+from nexus3d.coordinate_systems import angle_between
 from nexus3d.matrix import rotate, translate
 from nexus3d.nexus_transformations import transformation_matrices_from
 

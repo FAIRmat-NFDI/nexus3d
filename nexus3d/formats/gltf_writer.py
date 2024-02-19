@@ -1,17 +1,15 @@
 """Functions for creating a gltf cube mesh file"""
-from sys import version_info
 import logging
+from sys import version_info
 from typing import Any, Dict, List, Mapping, Union
-import numpy as np
-from numpy.typing import NDArray
-import pygltflib
 
-from nexus3d.formats.mesh import (
-    create_cube_arrays,
-    create_cone_arrays,
-    get_mesh_from_stl,
-)
+import numpy as np
+import pygltflib
+from numpy.typing import NDArray
+
 from nexus3d.formats.interfaces import WriterInput
+from nexus3d.formats.mesh import (create_cone_arrays, create_cube_arrays,
+                                  get_mesh_from_stl)
 from nexus3d.matrix import rotate, translate
 
 TransformationMatrix = Union[Dict[str, NDArray[np.float64]], NDArray[np.float64]]

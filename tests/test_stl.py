@@ -1,8 +1,9 @@
 """Tests for stl file functions"""
 import numpy as np
 from numpy.testing import assert_array_almost_equal
-from nexus3d.formats.mesh import create_cube_arrays, get_mesh_from_stl
+
 from nexus3d.formats.interfaces import WriterInput
+from nexus3d.formats.mesh import create_cube_arrays, get_mesh_from_stl
 from nexus3d.formats.stl_writer import write_stl_file
 
 
