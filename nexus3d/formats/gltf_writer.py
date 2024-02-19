@@ -8,8 +8,11 @@ import pygltflib
 from numpy.typing import NDArray
 
 from nexus3d.formats.interfaces import WriterInput
-from nexus3d.formats.mesh import (create_cone_arrays, create_cube_arrays,
-                                  get_mesh_from_stl)
+from nexus3d.formats.mesh import (
+    create_cone_arrays,
+    create_cube_arrays,
+    get_mesh_from_stl,
+)
 from nexus3d.matrix import rotate, translate
 
 TransformationMatrix = Union[Dict[str, NDArray[np.float64]], NDArray[np.float64]]
