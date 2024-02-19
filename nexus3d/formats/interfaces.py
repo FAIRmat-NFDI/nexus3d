@@ -1,6 +1,7 @@
 """Interfacies for function communication"""
 from dataclasses import dataclass
 from typing import Dict, Mapping, Optional, Union
+
 import numpy as np
 from numpy.typing import NDArray
 

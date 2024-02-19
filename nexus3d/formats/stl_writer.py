@@ -1,11 +1,12 @@
 """Functions for creating a stl cube mesh file"""
 from typing import Dict, Mapping, Union
+
 import numpy as np
 from numpy.typing import NDArray
 from stl import mesh
 
-from nexus3d.formats.mesh import create_cube_arrays
 from nexus3d.formats.interfaces import WriterInput
+from nexus3d.formats.mesh import create_cube_arrays
 
 TransformationMatrixDict = Mapping[
     str, Union[Dict[str, NDArray[np.float64]], NDArray[np.float64]]

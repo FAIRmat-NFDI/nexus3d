@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from functools import partial
 from typing import Dict
+
 import numpy as np
 from numpy.typing import NDArray
 

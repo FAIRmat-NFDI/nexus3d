@@ -1,7 +1,8 @@
 """Tests the CLI"""
 import os
-from click.testing import CliRunner
+
 import pytest
+from click.testing import CliRunner
 
 from nexus3d.nexus_transformations import cli
 
