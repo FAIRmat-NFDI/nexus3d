@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
-from pytest import mark
+from pytest import mark, param
 from scipy.spatial.transform import Rotation
 
 from nexus3d.coordinate_systems import angle_between
@@ -28,7 +28,10 @@ def get_all_matrices():
     transformation_matrices = []
     for example_file_path in example_file_paths():
         transformation_matrices.append(
-            transformation_matrices_from(example_file_path, False)
+            param(
+                transformation_matrices_from(example_file_path, False),
+                id=example_file_path.rsplit("/", 1)[-1],
+            )
         )
     return transformation_matrices
 
