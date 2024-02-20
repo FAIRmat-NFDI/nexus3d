@@ -26,12 +26,24 @@ TransformationMatrixXarray = Mapping[str, Union[Dict[str, xr.DataArray], xr.Data
 
 
 def transformation_matrices_xarray(
-    fname: str, include_process: bool, store_intermediate: bool = False
+    fname: str, include_process: bool = False, store_intermediate: bool = False
 ) -> TransformationMatrixXarray:
     """
-    Reads all NXtransformations from a nexus file
-    into a dict of xarray's.
-    The xarray's contain the field values as a coordinate axis.
+    Reads the transformation matrices from a file and generates a dict of xarray's.
+    Every field is a coordinate axis in the xarray.
+
+    Args:
+        fname (str): The hdf5/NeXus file from which to read the transformation matrices.
+        include_process (bool, optional):
+            Whether all /process entries should be included. Defaults to False.
+        store_intermediate (bool, optional):
+            If True the complete chain with all intermediate matrices are stored.
+            Defaults to False.
+
+    Returns:
+        TransformationMatrixXarray:
+            The resulting xarray containing the transformation matrices with the
+            field values as coordiante axis.
     """
 
     def store_in_chain(entry: str, matrix: xr.DataArray):
