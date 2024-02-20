@@ -30,7 +30,8 @@ def transformation_matrices_xarray(
 ) -> TransformationMatrixXarray:
     """
     Reads all NXtransformations from a nexus file
-    and creates a transformation matrix from them.
+    into a dict of xarray's.
+    The xarray's contain the field values as a coordinate axis.
     """
 
     def store_in_chain(entry: str, matrix: xr.DataArray):
@@ -151,6 +152,10 @@ def transformation_matrices_xarray(
 def transformation_matrices_from(
     fname: str, include_process: bool, store_intermediate: bool = False
 ) -> TransformationMatrixDict:
+    """
+    Reads all NXtransformations from a nexus file
+    and creates a transformation matrix from them.
+    """
     tmatrices = transformation_matrices_xarray(
         fname, include_process, store_intermediate
     )
