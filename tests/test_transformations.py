@@ -1,29 +1,39 @@
 """Test correct reading and reduction of transformations"""
-import os
+from pathlib import Path
 
 import numpy as np
 from numpy.testing import assert_almost_equal, assert_array_almost_equal
-from pytest import fixture
+from pytest import mark
 from scipy.spatial.transform import Rotation
 
 from nexus3d.coordinate_systems import angle_between
 from nexus3d.matrix import rotate, translate
-from nexus3d.nexus_transformations import transformation_matrices_from
+from nexus3d.nexus_transformations import (
+    transformation_matrices_from,
+    transformation_matrices_xarray,
+)
 
 # pylint: disable=redefined-outer-name
 
 
-@fixture
-def example_file_path():
+def example_file_paths():
     """Get the transformation example file path."""
-    path = os.getenv("PYTEST_CURRENT_TEST").rsplit("/", 1)[0]
-    return f"{path}/data/transformation_example.h5"
+    path = Path(__file__).parent
+
+    return [
+        str(path / "data" / "transformation_example.h5"),
+        str(path / "data" / "transformation_example_array.h5"),
+    ]
 
 
-@fixture
-def tmatrices(example_file_path):
+def get_all_matrices():
     """Get the transformation matrixes from the example file."""
-    return transformation_matrices_from(example_file_path, False)
+    transformation_matrices = []
+    for example_file_path in example_file_paths():
+        transformation_matrices.append(
+            transformation_matrices_from(example_file_path, False)
+        )
+    return transformation_matrices
 
 
 def test_correct_rotation_matrix():
@@ -42,6 +52,7 @@ def test_correct_rotation_matrix():
         assert_array_almost_equal(nexus_matrix, rot_matrix)
 
 
+@mark.parametrize("tmatrices", get_all_matrices())
 def test_correct_chain_resolution_from_nexus(tmatrices):
     """The transformation chain is resolved to the correct matrix from a nexus file"""
 
@@ -88,6 +99,51 @@ def test_correct_chain_resolution_from_nexus(tmatrices):
     )
 
 
+def test_correct_xarray_retrieval():
+    """Test if the transformation matrices are correctly retrieved from an xarray file"""
+    tmatrices = transformation_matrices_xarray(example_file_paths()[1], False)
+
+    assert len(tmatrices["instrument/manipulator"].coords) == 3
+    assert (
+        len(
+            tmatrices["instrument/manipulator"].coords[
+                "/entry/instrument/manipulator/transformations/rot_x"
+            ]
+        )
+        == 6
+    )
+    assert (
+        len(
+            tmatrices["instrument/manipulator"].coords[
+                "/entry/instrument/manipulator/transformations/rot_z"
+            ]
+        )
+        == 1
+    )
+    assert (
+        len(
+            tmatrices["instrument/manipulator"].coords[
+                "/entry/instrument/manipulator/transformations/trans_z"
+            ]
+        )
+        == 1
+    )
+
+    m_rot_z = rotate(np.deg2rad(-25), np.array([0, 0, 1]))
+    m_trans_z = translate(-0.32 * np.array([0, 0, 1]))
+
+    for i, rot_x in enumerate([-90, 10, 20, 30, 40, 50]):
+        m_rot_x = rotate(np.deg2rad(rot_x), np.array([1, 0, 0]))
+
+        assert_almost_equal(
+            tmatrices["instrument/manipulator"].values[i, 0, 0, :, :],
+            m_rot_x @ m_rot_z @ m_trans_z,
+        )
+
+
+@mark.parametrize(
+    "tmatrices, example_file_path", zip(get_all_matrices(), example_file_paths())
+)
 def test_full_chain_extraction(tmatrices, example_file_path):
     """Test the full chain extraction from the example file."""
     tmatrices_chain = transformation_matrices_from(example_file_path, False, True)
@@ -101,6 +157,7 @@ def test_full_chain_extraction(tmatrices, example_file_path):
         assert_array_almost_equal(matrix, last_matrix)
 
 
+@mark.parametrize("tmatrices", get_all_matrices())
 def test_angle_between(tmatrices):
     """Test if the angle between the sample z-axis and beam axis is calculated correctly"""
     transformed_z = (
