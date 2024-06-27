@@ -68,6 +68,7 @@ Options:
                         for gltf or glb files.   [default: cone]
   --blender             Rotates the coordinate system by 90 degree around the
                         x-axis. This maps the axes correctly to blender.
+  -l, --left-handed     Applies transformations left-handedly.
   --help                Show this message and exit.
 ```
 

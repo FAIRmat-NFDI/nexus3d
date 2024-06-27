@@ -1,4 +1,5 @@
 """Tests the CLI"""
+
 import os
 
 import pytest
