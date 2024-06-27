@@ -32,7 +32,7 @@ class Config:
     left_handed: bool = False
 
 
-config = Config()
+cs_config = Config()
 
 
 def transformation_matrices_xarray(
@@ -87,7 +87,9 @@ def transformation_matrices_xarray(
                 dims=[entry, "m1", "m2"],
                 coords={entry: field},
             )
-        elif isinstance(field, (int, float, np.int64, np.float64)):
+        elif isinstance(
+            field, (int, float, np.int32, np.int64, np.float32, np.float64)
+        ):
             matrices = xr.DataArray(
                 np.zeros((1, 4, 4)), dims=[entry, "m1", "m2"], coords={entry: [field]}
             )
@@ -103,11 +105,11 @@ def transformation_matrices_xarray(
 
             if attrs["transformation_type"] == "translation":
                 matrices[i] = translate(
-                    field_si * vector, offset_si, left_handed=config.left_handed
+                    field_si * vector, offset_si, left_handed=cs_config.left_handed
                 )
             elif attrs["transformation_type"] == "rotation":
                 matrices[i] = rotate(
-                    field_si, vector, offset_si, left_handed=config.left_handed
+                    field_si, vector, offset_si, left_handed=cs_config.left_handed
                 )
             else:
                 raise ValueError(
@@ -163,6 +165,9 @@ def transformation_matrices_xarray(
         for name, transformation_group in transformation_groups.items():
             if store_intermediate:
                 matrix_chain: Dict[str, xr.DataArray] = OrderedDict()
+
+            if "/" in transformation_group and not transformation_group.startswith("/"):
+                transformation_group = f"{name}/{transformation_group}"
 
             transformation_matrix = get_transformation_matrix(
                 h5file, transformation_group
