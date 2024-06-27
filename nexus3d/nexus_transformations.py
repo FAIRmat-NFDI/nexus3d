@@ -351,7 +351,7 @@ def cli(  # pylint: disable=too-many-arguments
             f"Cannot write to format {file_format} for output file {cli_input.output}"
         )
 
-    config.left_handed = left_handed
+    cs_config.left_handed = left_handed
 
     config_dict = {}
     if config:

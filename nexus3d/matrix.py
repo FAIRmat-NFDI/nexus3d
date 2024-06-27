@@ -117,7 +117,10 @@ def translate(
     if offset is not None:
         trans += offset
 
-    x, y, z = trans[0], trans[2], trans[1] if left_handed else trans
+    if left_handed:
+        x, y, z = trans[0], trans[2], trans[1]
+    else:
+        x, y, z = trans[0], trans[1], trans[2]
     return np.array(
         [
             [1, 0, 0, x],
