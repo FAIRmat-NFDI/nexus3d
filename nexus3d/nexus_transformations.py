@@ -1,4 +1,5 @@
 """Create a stl from NXtransformation groups"""
+
 import json
 import os
 from collections import OrderedDict
@@ -77,7 +78,9 @@ def transformation_matrices_xarray(
                 dims=[entry, "m1", "m2"],
                 coords={entry: field},
             )
-        elif isinstance(field, (int, float, np.int64, np.float64)):
+        elif isinstance(
+            field, (int, float, np.int32, np.int64, np.float32, np.float64)
+        ):
             matrices = xr.DataArray(
                 np.zeros((1, 4, 4)), dims=[entry, "m1", "m2"], coords={entry: [field]}
             )
@@ -149,6 +152,9 @@ def transformation_matrices_xarray(
         for name, transformation_group in transformation_groups.items():
             if store_intermediate:
                 matrix_chain: Dict[str, xr.DataArray] = OrderedDict()
+
+            if "/" in transformation_group and not transformation_group.startswith("/"):
+                transformation_group = f"{name}/{transformation_group}"
 
             transformation_matrix = get_transformation_matrix(
                 h5file, transformation_group
