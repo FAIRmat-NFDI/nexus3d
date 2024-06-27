@@ -3,6 +3,7 @@
 import json
 import os
 from collections import OrderedDict
+from dataclasses import dataclass
 from os import path
 from sys import version_info
 from typing import Any, Callable, Dict, Mapping, Union
@@ -24,6 +25,14 @@ TransformationMatrixDict = Mapping[
 ]
 
 TransformationMatrixXarray = Mapping[str, Union[Dict[str, xr.DataArray], xr.DataArray]]
+
+
+@dataclass
+class Config:
+    left_handed: bool = False
+
+
+config = Config()
 
 
 def transformation_matrices_xarray(
@@ -78,9 +87,7 @@ def transformation_matrices_xarray(
                 dims=[entry, "m1", "m2"],
                 coords={entry: field},
             )
-        elif isinstance(
-            field, (int, float, np.int32, np.int64, np.float32, np.float64)
-        ):
+        elif isinstance(field, (int, float, np.int64, np.float64)):
             matrices = xr.DataArray(
                 np.zeros((1, 4, 4)), dims=[entry, "m1", "m2"], coords={entry: [field]}
             )
@@ -95,9 +102,13 @@ def transformation_matrices_xarray(
             field_si = ureg(f"{field} {attrs['units']}").to_base_units().magnitude  # type: ignore
 
             if attrs["transformation_type"] == "translation":
-                matrices[i] = translate(field_si * vector, offset_si)
+                matrices[i] = translate(
+                    field_si * vector, offset_si, left_handed=config.left_handed
+                )
             elif attrs["transformation_type"] == "rotation":
-                matrices[i] = rotate(field_si, vector, offset_si)
+                matrices[i] = rotate(
+                    field_si, vector, offset_si, left_handed=config.left_handed
+                )
             else:
                 raise ValueError(
                     f"Unknown transformation type `{attrs['transformation_type']}`"
@@ -152,9 +163,6 @@ def transformation_matrices_xarray(
         for name, transformation_group in transformation_groups.items():
             if store_intermediate:
                 matrix_chain: Dict[str, xr.DataArray] = OrderedDict()
-
-            if "/" in transformation_group and not transformation_group.startswith("/"):
-                transformation_group = f"{name}/{transformation_group}"
 
             transformation_matrix = get_transformation_matrix(
                 h5file, transformation_group
@@ -274,6 +282,14 @@ def apply_blender_transform(
         "This maps the axes correctly to blender."
     ),
 )
+@click.option(
+    "-l",
+    "--left-handed",
+    is_flag=True,
+    default=False,
+    type=bool,
+    help=("Applies transformations left-handedly."),
+)
 def cli(  # pylint: disable=too-many-arguments
     file: str,
     config: str,
@@ -283,6 +299,7 @@ def cli(  # pylint: disable=too-many-arguments
     include_process: bool,
     store_intermediate: bool,
     blender: bool,
+    left_handed: bool,
     shape: str,
 ):
     """
@@ -328,6 +345,8 @@ def cli(  # pylint: disable=too-many-arguments
         raise NotImplementedError(
             f"Cannot write to format {file_format} for output file {cli_input.output}"
         )
+
+    config.left_handed = left_handed
 
     config_dict = {}
     if config:

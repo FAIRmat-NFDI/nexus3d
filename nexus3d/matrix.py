@@ -1,4 +1,5 @@
 """Transformation matrices for nexus"""
+
 from typing import Optional
 
 import numpy as np
@@ -10,6 +11,7 @@ def rotate(
     angle: float,
     axis: NDArray[np.float64],
     offset: Optional[NDArray[np.float64]] = None,
+    left_handed: bool = False,
 ) -> NDArray[np.float64]:
     """Generates a 4D rotation matrix
 
@@ -24,7 +26,32 @@ def rotate(
     cosa1 = 1 - cosa
     sina = np.sin(angle)
 
-    rot_matrix = np.array(
+    if left_handed:
+        return np.array(
+            [
+                [
+                    cosa + v_x**2 * cosa1,
+                    v_x * v_z * cosa1 + v_y * sina,
+                    v_x * v_y * cosa1 - v_z * sina,
+                    offset[0],
+                ],
+                [
+                    v_z * v_x * cosa1 - v_y * sina,
+                    cosa + v_z**2 * cosa1,
+                    v_z * v_y * cosa1 + v_x * sina,
+                    offset[2],
+                ],
+                [
+                    v_y * v_x * cosa1 + v_z * sina,
+                    v_y * v_z * cosa1 - v_x * sina,
+                    cosa + v_y**2 * cosa1,
+                    offset[1],
+                ],
+                [0, 0, 0, 1],
+            ]
+        )
+
+    return np.array(
         [
             [
                 cosa + v_x**2 * cosa1,
@@ -47,8 +74,6 @@ def rotate(
             [0, 0, 0, 1],
         ]
     )
-
-    return rot_matrix
 
 
 def rotate_z_onto_vec(
@@ -79,7 +104,9 @@ def rotate_z_onto_vec(
 
 
 def translate(
-    translation: NDArray[np.float64], offset: Optional[NDArray[np.float64]] = None
+    translation: NDArray[np.float64],
+    offset: Optional[NDArray[np.float64]] = None,
+    left_handed: bool = False,
 ) -> NDArray[np.float64]:
     """Generates a 4D translation matrix.
 
@@ -90,11 +117,12 @@ def translate(
     if offset is not None:
         trans += offset
 
+    x, y, z = trans[0], trans[2], trans[1] if left_handed else trans
     return np.array(
         [
-            [1, 0, 0, trans[0]],
-            [0, 1, 0, trans[1]],
-            [0, 0, 1, trans[2]],
+            [1, 0, 0, x],
+            [0, 1, 0, y],
+            [0, 0, 1, z],
             [0, 0, 0, 1],
         ]
     )
