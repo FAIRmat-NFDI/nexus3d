@@ -70,7 +70,7 @@ def transformation_matrices_xarray(
             if req_attr not in attrs:
                 raise ValueError(f"`{req_attr}` attribute not found in {entry}")
 
-        if "offset" in attrs and "offsets_units" not in attrs:
+        if "offset" in attrs and "offset_units" not in attrs:
             raise ValueError(
                 f"Found `offset` attribute in {entry} but no `offset_units` could be found."
             )
