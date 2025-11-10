@@ -100,6 +100,37 @@ def create_cone_arrays(scale: float = 1):
     return indices, vertices * scale
 
 
+def create_triangle_arrays(scale: float = 1):
+    """Get vertices and index arrays for creating a triangle cone.
+
+    Args:
+        scale (float, optional): The scale of the cone. Defaults to 1.
+
+    Returns:
+        (np.ndarray, np.ndarray): The points and triangles array of the cone.
+    """
+    # base vertices and apex
+    v0 = np.array([0.0, 0.0, 0.0]) # apex
+    v1 = np.array([1/3, 0.0, -1.0])
+    v2 = np.array([0.0, 3/4, -1.0])
+    v3 = np.array([0.0, 0.0, -1.0])
+    v4 = np.array([1/24, 1/8, -0.9]) # centroid of the sloped base
+    vertices = np.array([v0, v1, v2, v3, v4], dtype=np.float32)
+
+    # faces
+    indices = np.array([
+        [1, 2, 3],  # xy face
+        [0, 1, 3],  # xz face
+        [0, 2, 3],  # yz face
+        # sloped base split into 3
+        [0, 1, 4],
+        [0, 2, 4],
+        [1, 2, 4],
+    ], dtype=np.uint32)
+
+    return indices, vertices * scale
+
+
 def get_mesh_from_stl(filename: str, unit: Optional[str] = None):
     """Reads a mesh as array of indices and vertices from a stl file.
 
