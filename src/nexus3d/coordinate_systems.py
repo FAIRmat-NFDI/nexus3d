@@ -56,3 +56,51 @@ def angle_between(vec1: NDArray[np.float64], vec2: NDArray[np.float64]):
     uvec1 = unit_vector(vec1)
     uvec2 = unit_vector(vec2)
     return np.arccos(np.clip(np.dot(uvec1, uvec2), -1, 1))
+
+
+# Get Euler angles from rotation matrix
+# based on https://stackoverflow.com/questions/15022630/how-to-calculate-the-angle-from-rotation-matrix
+def angles_from_matrix(tmatrix, quadrant=1):
+    """
+    Calculate Euler angles (chi (azimuth), beta (tilt), theta (polar)) from a rotation matrix.
+    This produces the sample angles are defined in the ARPES coordinate system convention.
+    https://arpes.readthedocs.io/en/latest/spectra.html#coordinate-conventions
+    """
+
+    if tmatrix[1][2] != 1 and tmatrix[1][2] != -1:
+        beta1 = np.arcsin(-tmatrix[1][2])
+        beta2 = np.pi - np.arcsin(-tmatrix[1][2])
+        chi1 = np.arctan2(tmatrix[1][0] / np.cos(beta1), tmatrix[1][1] / np.cos(beta1))
+        chi2 = np.arctan2(tmatrix[1][0] / np.cos(beta2), tmatrix[1][1] / np.cos(beta2))
+        theta1 = np.arctan2(
+            tmatrix[0][2] / np.cos(beta1), tmatrix[2][2] / np.cos(beta1)
+        )
+        theta2 = np.arctan2(
+            tmatrix[0][2] / np.cos(beta2), tmatrix[2][2] / np.cos(beta2)
+        )
+
+        # IMPORTANT NOTE here, there is more than one solution but we choose the first for this case for simplicity !
+        # You can insert your own domain logic here on how to handle both solutions appropriately (see the reference publication link for more info).
+        if quadrant == 1:
+            beta = beta1
+            chi = chi1
+            theta = theta1
+        else:
+            beta = beta2
+            chi = chi2
+            theta = theta2
+    else:
+        chi = 0  # anything (we default this to zero)
+        if tmatrix[1][2] == -1:
+            beta = np.pi / 2
+            theta = chi + np.arctan2(tmatrix[0][1], tmatrix[0][0])
+        else:
+            beta = -np.pi / 2
+            theta = -1 * chi + np.arctan2(tmatrix[0][1], tmatrix[0][0])
+
+    # convert from radians to degrees
+    chi = np.rad2deg(chi)
+    beta = np.rad2deg(beta)
+    theta = np.rad2deg(theta)
+
+    return (chi, beta, theta)
