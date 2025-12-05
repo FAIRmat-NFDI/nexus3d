@@ -49,6 +49,7 @@ dev = [
     "types-requests",
     "pre-commit",
     "debugpy",
+    "scipy",
 ]
 
 [project.scripts]
