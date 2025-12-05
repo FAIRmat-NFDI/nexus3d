@@ -23,10 +23,10 @@ jobs:
           uv pip install --system -r dev-requirements.txt
       - name: ruff
         run: |
-          ruff nexus3d tests
+          ruff src/nexus3d tests
       - name: ruff formatting
         run: |
-          ruff format --check nexus3d tests
+          ruff format --check src/nexus3d tests
       - name: mypy
         run: |
-          python -m mypy --ignore-missing-imports --follow-imports=silent --no-strict-optional nexus3d
+          python -m mypy --ignore-missing-imports --follow-imports=silent --no-strict-optional src/nexus3d

@@ -11,13 +11,12 @@ authors = [
 description = "Convert NXtransformation matrices inside a nexus file to 3D file formats"
 readme = "README.md"
 license = { file = "LICENSE" }
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 classifiers = [
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
@@ -54,12 +53,13 @@ nexus3d = "nexus3d.nexus_transformations:cli"
 version_scheme = "guess-next-dev"
 local_scheme = "node-and-date"
 
-[tool.setuptools]
-packages = ["nexus3d"]
+[tool.setuptools.packages.find]
+where = [
+    "src",
+]
 
 [tool.ruff]
 include = ["src/*.py", "tests/*.py"]
-exclude = ["src/pynxtools/definitions"]
 line-length = 88
 indent-width = 4
 
@@ -98,4 +98,3 @@ ignore_missing_imports = true
 follow_imports = "silent"
 no_strict_optional = true
 disable_error_code = "import, annotation-unchecked"
-exclude = ["src/pynxtools/definitions/*"]
