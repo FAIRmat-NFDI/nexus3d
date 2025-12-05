@@ -60,7 +60,9 @@ def angle_between(vec1: NDArray[np.float64], vec2: NDArray[np.float64]):
 
 # Get Euler angles from rotation matrix
 # based on https://stackoverflow.com/questions/15022630/how-to-calculate-the-angle-from-rotation-matrix
-def angles_from_matrix(tmatrix, quadrant=1):
+def angles_from_matrix(
+    tmatrix: NDArray[np.float64], quadrant: int = 1
+) -> tuple[float, float, float]:
     """
     Calculate Euler angles (chi (azimuth), beta (tilt), theta (polar)) from a rotation matrix.
     This produces the sample angles are defined in the ARPES coordinate system convention.
