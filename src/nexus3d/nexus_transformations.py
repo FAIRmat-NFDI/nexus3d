@@ -179,22 +179,26 @@ def transformation_matrices_xarray(
 
     return transformation_matrices
 
-def decode_attrs(attrs, encoding='utf-8'):
+
+def decode_attrs(attrs, encoding="utf-8"):
     """
-    Returns a copy of an HDF5 attribute dictionary 
+    Returns a copy of an HDF5 attribute dictionary
     where all byte strings are decoded to str.
     """
     decoded = {}
     for key, value in attrs.items():
-        if hasattr(value, 'decode'): # single byte string
+        if hasattr(value, "decode"):  # single byte string
             decoded[key] = value.decode(encoding)
-        elif isinstance(value, (list, tuple)): # sequence or numpy array of bytes
-            decoded[key] = [v.decode(encoding) if hasattr(v, 'decode') else v for v in value]
-        elif getattr(value, 'dtype', None) is not None and value.dtype.kind == 'S':
+        elif isinstance(value, (list, tuple)):  # sequence or numpy array of bytes
+            decoded[key] = [
+                v.decode(encoding) if hasattr(v, "decode") else v for v in value
+            ]
+        elif getattr(value, "dtype", None) is not None and value.dtype.kind == "S":
             decoded[key] = value.astype(str).tolist()
         else:
             decoded[key] = value
     return decoded
+
 
 def transformation_matrices_from(
     fname: str, include_process: bool, store_intermediate: bool = False
