@@ -1,4 +1,5 @@
 """Interfacies for function communication"""
+
 from dataclasses import dataclass
 from typing import Dict, Mapping, Optional, Union
 

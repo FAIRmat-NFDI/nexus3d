@@ -1,4 +1,5 @@
 """Functions for creating a stl cube mesh file"""
+
 from typing import Dict, Mapping, Union
 
 import numpy as np

@@ -1,4 +1,5 @@
 """Functions for creating a gltf cube mesh file"""
+
 import logging
 from sys import version_info
 from typing import Any, Dict, List, Mapping, Union
