@@ -253,7 +253,11 @@ def write_gltf_file(cli_input: WriterInput):
         )
 
     def create_meshs():
-        shapes = {"cube": create_cube_arrays, "cone": create_cone_arrays, "triangle": create_triangle_arrays}
+        shapes = {
+            "cube": create_cube_arrays,
+            "cone": create_cone_arrays,
+            "triangle": create_triangle_arrays,
+        }
         mesh_indices = {}
         shape_index = None
         for name in cli_input.transformation_matrices:
