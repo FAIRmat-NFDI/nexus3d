@@ -1,4 +1,4 @@
-"""Create a coordiante system from NXtransformation groups"""
+"""Create a coordinate system from NXtransformation groups"""
 
 from dataclasses import dataclass
 from functools import partial
@@ -35,7 +35,7 @@ def coord_systems_from(
     coordinate_systems = {}
 
     for name, transformation_matrix in transformation_matrices.items():
-        transform_vec = partial(transform, matrix=transformation_matrix)
+        transform_vec = partial(transform, matrix=transformation_matrix)  # type: ignore
         coordinate_systems[name] = CoordinateSystem(
             origin=transform_vec(np.array([0, 0, 0, 1])),
             x_axis=transform_vec(np.array([1, 0, 0, 0])),
