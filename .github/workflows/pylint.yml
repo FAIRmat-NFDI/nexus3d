@@ -1,32 +1,28 @@
-name: python
+name: linting
 
 on: [push]
+
+env:
+  python-version: 3.12
 
 jobs:
   linting:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - name: Install uv and set the python version to ${{ env.python-version }}
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: "3.12"
-      - name: Install tooling
+          python-version: ${{ env.python-version }}
+      - name: Install package and dev requirements
         run: |
-          python -m pip install --upgrade pip
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-      - name: Install package
+          uv pip install .[dev]
+      - name: ruff check
         run: |
-          uv pip install --system --no-deps .
-      - name: Install dev requirements
-        run: |
-          uv pip install --system -r dev-requirements.txt
-      - name: ruff
-        run: |
-          ruff src/nexus3d tests
-      - name: ruff formatting
+          ruff check src/nexus3d tests
+      - name: ruff format
         run: |
           ruff format --check src/nexus3d tests
       - name: mypy
         run: |
-          python -m mypy --ignore-missing-imports --follow-imports=silent --no-strict-optional src/nexus3d
+          mypy src/nexus3d tests
