@@ -1,0 +1,4 @@
+prune *
+exclude *
+recursive-include src/nexsus3d *.py
+include pyproject.toml README.md
