@@ -2,4 +2,4 @@
 
 from pint import UnitRegistry
 
-ureg = UnitRegistry()
+ureg = UnitRegistry()  # type: ignore
