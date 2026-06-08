@@ -12,6 +12,7 @@ from nexus3d.formats.interfaces import WriterInput
 from nexus3d.formats.mesh import (
     create_cone_arrays,
     create_cube_arrays,
+    create_triangle_arrays,
     get_mesh_from_stl,
 )
 from nexus3d.matrix import rotate, translate
@@ -252,7 +253,11 @@ def write_gltf_file(cli_input: WriterInput):
         )
 
     def create_meshs():
-        shapes = {"cube": create_cube_arrays, "cone": create_cone_arrays}
+        shapes = {
+            "cube": create_cube_arrays,
+            "cone": create_cone_arrays,
+            "triangle": create_triangle_arrays,
+        }
         mesh_indices = {}
         shape_index = None
         for name in cli_input.transformation_matrices:

@@ -53,7 +53,7 @@ def transformation_matrices_xarray(
     Returns:
         TransformationMatrixXarray:
             The resulting xarray containing the transformation matrices with the
-            field values as coordiante axis.
+            field values as coordinate axis.
     """
 
     def store_in_chain(entry: str, matrix: xr.DataArray):
@@ -64,13 +64,13 @@ def transformation_matrices_xarray(
 
     def get_transformation_matrix(h5file: h5py.File, entry: str):
         required_attrs = ["depends_on", "vector", "transformation_type", "units"]
-        attrs = h5file[entry].attrs
+        attrs = decode_attrs(h5file[entry].attrs)
 
         for req_attr in required_attrs:
             if req_attr not in attrs:
                 raise ValueError(f"`{req_attr}` attribute not found in {entry}")
 
-        if "offset" in attrs and "offsets_units" not in attrs:
+        if "offset" in attrs and "offset_units" not in attrs:
             raise ValueError(
                 f"Found `offset` attribute in {entry} but no `offset_units` could be found."
             )
@@ -180,6 +180,26 @@ def transformation_matrices_xarray(
     return transformation_matrices
 
 
+def decode_attrs(attrs, encoding="utf-8"):
+    """
+    Returns a copy of an HDF5 attribute dictionary
+    where all byte strings are decoded to str.
+    """
+    decoded = {}
+    for key, value in attrs.items():
+        if hasattr(value, "decode"):  # single byte string
+            decoded[key] = value.decode(encoding)
+        elif isinstance(value, (list, tuple)):  # sequence or numpy array of bytes
+            decoded[key] = [
+                v.decode(encoding) if hasattr(v, "decode") else v for v in value
+            ]
+        elif getattr(value, "dtype", None) is not None and value.dtype.kind == "S":
+            decoded[key] = value.astype(str).tolist()
+        else:
+            decoded[key] = value
+    return decoded
+
+
 def transformation_matrices_from(
     fname: str, include_process: bool, store_intermediate: bool = False
 ) -> TransformationMatrixDict:
@@ -270,8 +290,8 @@ def apply_blender_transform(
 )
 @click.option(
     "--shape",
-    default="cone",
-    type=click.Choice(["cone", "cube"]),
+    default="triangle",
+    type=click.Choice(["cone", "cube", "triangle"]),
     help=(
         "The shape to write into the gltf file. Only applicable for gltf or glb files. "
     ),
