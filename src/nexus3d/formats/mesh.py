@@ -1,4 +1,5 @@
 """Cube mesh utility functions (e.g. creating cube arrays)"""
+
 from typing import Optional
 
 import numpy as np

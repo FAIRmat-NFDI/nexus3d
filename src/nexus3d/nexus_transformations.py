@@ -355,7 +355,7 @@ def cli(  # pylint: disable=too-many-arguments
 
     config_dict = {}
     if config:
-        with open(config, "r", encoding="utf-8") as json_file:
+        with open(config, encoding="utf-8") as json_file:
             config_dict = json.load(json_file)
 
     format_map: Dict[str, Callable[[WriterInput], None]] = {
